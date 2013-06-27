@@ -17,6 +17,8 @@ Cube* mouseCube = new Cube(0.1f);
 
 
 
+
+
 void Draw() {
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);	// Clear Screen And Depth Buffer
 
