@@ -9,8 +9,6 @@
 
 
 
-
-
 float _x;
 float _y;
 int windWidth = 640;
