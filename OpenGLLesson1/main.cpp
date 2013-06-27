@@ -6,6 +6,7 @@
 // Copyright 2010 XoaX - For personal use only, not for distribution
 #include "Cube.h"
 #include <glut.h>
+#include <math.h>
 
 float _x;
 float _y;
@@ -14,6 +15,76 @@ int windHeight = 480;
 bool pressedMouse = false;
 Cube* cube = new Cube(2.0f);
 Cube* mouseCube = new Cube(0.1f);
+
+typedef struct PONTO {
+	float x;
+	float y;
+	float z;
+};
+
+void updateCubePos(PONTO* mouse, PONTO* object, float cubeLateralSize){
+	float halfSide = cubeLateralSize /2.0f;
+
+	float objTop = object->y + halfSide;
+	float objBottom = object->y - halfSide;
+	float objLeft = object->x - halfSide;
+	float objRight = object->x + halfSide;
+	/*float objFront = object->z + halfSide;
+	float objBack = object->z - halfSide; */
+
+	float newX = object->x;
+	float newY = object->y;
+	/*float newZ = object->z;*/
+
+	
+	BOOL verticalInvasion = mouse->y < objTop && mouse->y > objBottom;
+	BOOL horizontalInvasion = mouse->x > objLeft && mouse->x < objRight;
+	/*BOOL depthInvasion = mouse->z > objBack && mouse->z < objFront;*/
+
+
+	BOOL hasInvasion = verticalInvasion && horizontalInvasion/* && depthInvasion*/;
+
+	if(hasInvasion){
+
+		float topDistance = abs(objTop - mouse->y);
+		float bottomDistance = abs(objBottom - mouse->y);
+		float leftDistance = abs(mouse->x - objLeft);
+		float rightDistance = abs( objRight - mouse->x);
+		/*float frontDistance = abs(objFront - mouse->z);
+		float backDistance = abs(objBack - mouse->z);*/
+
+		BOOL deCima = topDistance < bottomDistance && topDistance < leftDistance && topDistance < rightDistance/* && topDistance < frontDistance && topDistance < backDistance*/;
+		BOOL deBaixo = bottomDistance < topDistance && bottomDistance < leftDistance && bottomDistance < rightDistance/* && bottomDistance < frontDistance && bottomDistance < backDistance*/;
+		BOOL daDireita = rightDistance < topDistance && rightDistance < bottomDistance && rightDistance < leftDistance /*&& rightDistance < frontDistance && rightDistance < backDistance*/;
+		BOOL daEsquerda = leftDistance < topDistance && leftDistance < bottomDistance && leftDistance < rightDistance /*&& leftDistance < frontDistance && leftDistance < backDistance*/;
+		/*BOOL daFrente = frontDistance < topDistance && frontDistance < bottomDistance && frontDistance < rightDistance && frontDistance < leftDistance && frontDistance < backDistance;
+		BOOL deTras =  backDistance < topDistance && backDistance < bottomDistance && backDistance < rightDistance && backDistance < leftDistance && backDistance < frontDistance;*/
+		
+		if(deCima){
+			newY = newY - (objTop - mouse->y);
+		}
+		if(deBaixo){
+			newY = newY + (mouse->y - objBottom);
+		}
+		if(daDireita){
+			newX = newX - (objRight - mouse->x);
+		}
+		if(daEsquerda){
+			newX = newX + (mouse->x - objLeft);
+		}
+		/*if(daFrente){
+			newZ = newZ - (objFront - mouse->z);
+		}
+		if(deTras){
+			newZ = newZ + (mouse->z - objBack);
+		}*/
+
+	}
+
+	object->x = newX;
+	object->y = newY;
+	/*object->z = newZ;*/
+}
 
 
 void Draw() {
@@ -29,6 +100,8 @@ void Draw() {
 
 	glFlush();
 }
+
+
 
 void Initialize(int width, int height) {
 	glShadeModel(GL_SMOOTH);							// Enable Smooth Shading
