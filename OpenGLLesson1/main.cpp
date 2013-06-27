@@ -7,8 +7,6 @@
 #include "Cube.h"
 #include <glut.h>
 
-
-
 float _x;
 float _y;
 int windWidth = 640;
@@ -16,9 +14,6 @@ int windHeight = 480;
 bool pressedMouse = false;
 Cube* cube = new Cube(2.0f);
 Cube* mouseCube = new Cube(0.1f);
-
-
-
 
 
 void Draw() {
