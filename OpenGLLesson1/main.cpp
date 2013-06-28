@@ -8,13 +8,29 @@
 #include <glut.h>
 #include <math.h>
 
+// ESTADOS //
+int JOGANDO = 0;
+int DESCENDO = 1;
+int VOLTANDO =  2;
+int SOLTANDO = 3;
+
+int estado = 0;
+
+// POSICAO DA GARRA //
 float _x;
+float _y = 5.0f;
 float _z;
+Cube* cube = new Cube(1.0f);
+
+// OBJETOS //
+//TODO: fazer um vetor com os objetos
+
+// OUTROS //
+float velocidade = 0.0007f;
 int windWidth = 640;
 int windHeight = 480;
-bool pressedMouse = false;
-Cube* cube = new Cube(1.0f);
-Cube* mouseCube = new Cube(0.1f);
+
+
 
 typedef struct PONTO {
 	float x;
@@ -94,19 +110,56 @@ void changeCameraPos(){
 			0.0f, 1.0f,  0.0f);
 }
 
+void detectaColisao(){
+	//TODO implementar um while que itera pelos objetos em busca de colisão. O chão também é um objeto
+	
+	bool haColisao = _y <= 1.0f;
+
+	if(haColisao){
+		//pega objeto
+		estado = VOLTANDO;
+	}
+
+}
+
+void desceCubo(){
+	if(_y >= 1.0f){
+		_y -= 1 * velocidade;
+	}
+}
+
+void voltaCuboEObjeto(){
+	if(_y < 5.0f){
+		_y += velocidade;
+	}else if(_x < 5.2f){
+		_x += velocidade;
+	}else if(_z > -6.0f){
+		_z -= velocidade;
+	}else{
+		estado = JOGANDO;
+	}
+}
+
 void Draw() {
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);	// Clear Screen And Depth Buffer
 
 	
 	changeCameraPos();
-	cube->move(_x, 1.0f, _z);
+
+	if(estado == JOGANDO){//trocar por switch
+		cube->move(_x, _y, _z);
+	}else if(estado == DESCENDO){
+		desceCubo();
+		cube->move(_x, _y, _z);
+		detectaColisao();
+	}else if(estado == VOLTANDO){
+		voltaCuboEObjeto();
+		cube->move(_x, _y, _z);
+	}
 	cube->draw();
 
-	changeCameraPos();
-	if(pressedMouse){
-		mouseCube->move(1.0f, 1.0f, 0.0f);
-		mouseCube->draw();
-	}
+	
+
 
 	changeCameraPos();
 	glBegin(GL_QUADS);
@@ -139,18 +192,21 @@ void Initialize(int width, int height) {
 }
 
 void processMouseClick(int button, int state, int x, int y) {
-	if(button == GLUT_LEFT_BUTTON && state == GLUT_DOWN){
-		pressedMouse = true;
-	}else{
-		pressedMouse = false;
+	if(estado == JOGANDO){
+		if(button == GLUT_LEFT_BUTTON && state == GLUT_DOWN){
+			estado = DESCENDO;
+		}
 	}
 }
 
 void processMouseMotion(int x, int z) {
 	x -= windWidth / 2;
 	z -= windHeight/ 2;
-	_x = (windHeight/35.0f - x) /35.0f;
-	_z = (windHeight/35.0f - z) /35.0f;
+	
+	if(estado == JOGANDO){
+		_x = (windHeight/35.0f - x) /35.0f;
+		_z = (windHeight/35.0f - z) /35.0f;
+	}
 }
 
 int main(int iArgc, char** cppArgv) {
