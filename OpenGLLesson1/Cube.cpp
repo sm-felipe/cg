@@ -17,7 +17,7 @@ void Cube::draw(){
 
 	float l = halfEdgeSize;
 
-	glLoadIdentity();							// Reset The Current Modelview Matrix
+	//glLoadIdentity();							// Reset The Current Modelview Matrix
 	glTranslatef(x, y, z);
 	glBegin(GL_QUADS);							// Draw A Quad								
 		glColor3f(0.0f,1.0f,0.0f);				// Set The Color To Green

@@ -9,11 +9,11 @@
 #include <math.h>
 
 float _x;
-float _y;
+float _z;
 int windWidth = 640;
 int windHeight = 480;
 bool pressedMouse = false;
-Cube* cube = new Cube(2.0f);
+Cube* cube = new Cube(1.0f);
 Cube* mouseCube = new Cube(0.1f);
 
 typedef struct PONTO {
@@ -25,6 +25,7 @@ typedef struct PONTO {
 void updateCubePos(PONTO* mouse, PONTO* object, float cubeLateralSize){
 	float halfSide = cubeLateralSize /2.0f;
 
+	//halfSide só funciona pra cubos, preciso receber esses dados melhor
 	float objTop = object->y + halfSide;
 	float objBottom = object->y - halfSide;
 	float objLeft = object->x - halfSide;
@@ -86,17 +87,35 @@ void updateCubePos(PONTO* mouse, PONTO* object, float cubeLateralSize){
 	/*object->z = newZ;*/
 }
 
+void changeCameraPos(){
+	glLoadIdentity();
+	gluLookAt(0.0f, 5.0f, -8.0,
+			0.0f, 0.0f,  0.0f,
+			0.0f, 1.0f,  0.0f);
+}
 
 void Draw() {
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);	// Clear Screen And Depth Buffer
 
+	
+	changeCameraPos();
+	cube->move(_x, 1.0f, _z);
+	cube->draw();
+
+	changeCameraPos();
 	if(pressedMouse){
 		mouseCube->move(1.0f, 1.0f, 0.0f);
 		mouseCube->draw();
 	}
 
-	cube->move(_x, _y, 0.0f);
-	cube->draw();
+	changeCameraPos();
+	glBegin(GL_QUADS);
+		glColor3f(1.0f, 1.0f, 1.0f);
+		glVertex3f(-6, 0, -6);
+		glVertex3f(-6, 0, 6);
+		glVertex3f(6, 0, 6);
+		glVertex3f(6, 0, -6);
+	glEnd();
 
 	glFlush();
 }
@@ -127,11 +146,11 @@ void processMouseClick(int button, int state, int x, int y) {
 	}
 }
 
-void processMouseMotion(int x, int y) {
+void processMouseMotion(int x, int z) {
 	x -= windWidth / 2;
-	y -= windHeight/ 2;
-	_x = x /80.0f ;
-	_y = (windHeight/80.0f - y) / 80.0f;
+	z -= windHeight/ 2;
+	_x = (windHeight/35.0f - x) /35.0f;
+	_z = (windHeight/35.0f - z) /35.0f;
 }
 
 int main(int iArgc, char** cppArgv) {
