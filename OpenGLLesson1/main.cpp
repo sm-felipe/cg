@@ -9,10 +9,10 @@
 #include <math.h>
 
 // ESTADOS //
-int JOGANDO = 0;
-int DESCENDO = 1;
-int VOLTANDO =  2;
-int SOLTANDO = 3;
+const int JOGANDO = 0;
+const int DESCENDO = 1;
+const int VOLTANDO =  2;
+const int SOLTANDO = 3;
 
 int estado = 0;
 
@@ -146,15 +146,21 @@ void Draw() {
 	
 	changeCameraPos();
 
-	if(estado == JOGANDO){//trocar por switch
-		cube->move(_x, _y, _z);
-	}else if(estado == DESCENDO){
-		desceCubo();
-		cube->move(_x, _y, _z);
-		detectaColisao();
-	}else if(estado == VOLTANDO){
-		voltaCuboEObjeto();
-		cube->move(_x, _y, _z);
+	switch (estado)	{
+		case JOGANDO:
+			cube->move(_x, _y, _z);
+			break;
+		case DESCENDO:
+			desceCubo();
+			cube->move(_x, _y, _z);
+			detectaColisao();
+			break;
+		case VOLTANDO:
+			voltaCuboEObjeto();
+			cube->move(_x, _y, _z);
+			break;
+		default:
+			break;
 	}
 	cube->draw();
 
