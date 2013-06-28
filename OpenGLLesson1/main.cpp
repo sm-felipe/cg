@@ -4,9 +4,13 @@
 // This C++ code and project are provided "as is" without warranty of any kind.
 //
 // Copyright 2010 XoaX - For personal use only, not for distribution
+
+
 #include "Cube.h"
 #include <glut.h>
 #include <math.h>
+
+
 
 // ESTADOS //
 const int JOGANDO = 0;
@@ -27,8 +31,8 @@ Cube* cube = new Cube(1.0f);
 
 // OUTROS //
 float velocidade = 0.0007f;
-int windWidth = 640;
-int windHeight = 480;
+int windWidth = 720;
+int windHeight = 540;
 
 
 
@@ -105,9 +109,14 @@ void updateCubePos(PONTO* mouse, PONTO* object, float cubeLateralSize){
 
 void changeCameraPos(){
 	glLoadIdentity();
-	gluLookAt(0.0f, 5.0f, -8.0,
-			0.0f, 0.0f,  0.0f,
-			0.0f, 1.0f,  0.0f);
+	if(0)
+		gluLookAt(5.0f, 2, -5,
+				0.0f, 2.0f,  0.0f,
+				0.0f, 1.0f,  0.0f);
+	else
+		gluLookAt(0.0f,5.0f, -8.0,
+				0.0f, 0.0f,  0.0f,
+				0.0f, 1.0f,  0.0f);
 }
 
 void detectaColisao(){
@@ -140,25 +149,72 @@ void voltaCuboEObjeto(){
 	}
 }
 
+void drawGarra(){
+
+	//draw center
+	changeCameraPos();
+	glColor3f(0.7,0.7,0.7);
+	glTranslatef(0, 5.5, 0);
+	glRotatef(90.0, 1, 0, 0);
+    glBegin(GL_POLYGON);
+		GLUquadricObj *obj = gluNewQuadric();
+		gluCylinder(obj, 0.6, 0.6, 0.5, 30, 30);
+    glEnd();
+
+	//draw left
+	changeCameraPos();
+	glColor3f(1,0.7,0.7);
+	glTranslatef(1.2, 4.6, 0);
+	glRotatef(270.0, 1, 0, 0);
+	glRotatef(-50.0, 0, 1, 0);
+	glutSolidCone(0.2, 1, 30, 30);
+
+	changeCameraPos();
+	glTranslatef(1.2, 4.7, 0);
+	glRotatef(270.0, 1, 0, 0);
+	glRotatef(-180.0, 0, 1, 0);
+	glutSolidCone(0.2, 1, 30, 30);
+
+	//draw right
+	changeCameraPos();
+	glColor3f(1,0.7,0.7);
+	glTranslatef(-1.2, 4.6, 0);
+	glRotatef(-90.0, 1, 0, 0);
+	glRotatef(50.0, 0, 1, 0);
+	glutSolidCone(0.2, 1, 30, 30);
+
+	changeCameraPos();
+	glTranslatef(-1.2, 4.7, 0);
+	glRotatef(-90.0, 1, 0, 0);
+	glRotatef(180.0, 0, 1, 0);
+	glutSolidCone(0.2, 1, 30, 30);
+
+}
+
 void Draw() {
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);	// Clear Screen And Depth Buffer
 
 	
-	changeCameraPos();
+	
+	drawGarra();
 
+	changeCameraPos();
 	switch (estado)	{
 		case JOGANDO:
 			cube->move(_x, _y, _z);
 			break;
+
 		case DESCENDO:
 			desceCubo();
 			cube->move(_x, _y, _z);
 			detectaColisao();
 			break;
+
 		case VOLTANDO:
 			voltaCuboEObjeto();
 			cube->move(_x, _y, _z);
 			break;
+
 		default:
 			break;
 	}
@@ -210,14 +266,15 @@ void processMouseMotion(int x, int z) {
 	z -= windHeight/ 2;
 	
 	if(estado == JOGANDO){
-		_x = (windHeight/35.0f - x) /35.0f;
-		_z = (windHeight/35.0f - z) /35.0f;
+		_x = (windHeight/30.0f - x) /30.0f;
+		_z = (windHeight/30.0f - z) /30.0f;
 	}
 }
 
+
 int main(int iArgc, char** cppArgv) {
 	
-
+	
 	glutInit(&iArgc, cppArgv);
 	glutInitDisplayMode(GLUT_SINGLE | GLUT_RGB |GLUT_DEPTH);
 	glutInitWindowSize(windWidth, windHeight);
@@ -231,6 +288,7 @@ int main(int iArgc, char** cppArgv) {
 	glutPassiveMotionFunc(processMouseMotion);
 	glutMotionFunc(processMouseMotion);
 	glutMainLoop();
+	FreeConsole();
 	return 0;
 }
 
