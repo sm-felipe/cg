@@ -27,8 +27,6 @@ int estado = 0;
 float _x;
 float _y = 5.0f;
 float _z;
-Cube* cube = new Cube(1.0f);
-
 
 
 float oldX = 0;
@@ -45,6 +43,7 @@ Cube* dirCube = new Cube(0.1f);
 //[x][2] é o baixo da bounding box
 //[x][3] é o objeto propriamente dito
 Cube* objects[1];
+int indiceColisao = -1;
 
 
 // controle da camera
@@ -100,7 +99,6 @@ void detectaColisao(){
 	bool bateuChao = _y <= yMin;
 
 	bool colidiu = false;
-	int indiceColisao = -1;
 		
 	for(int i = 0; i < sizeOfObjects(); i++){
 		Cube* obj = objects[i];
@@ -110,19 +108,40 @@ void detectaColisao(){
 			break;
 		}
 	}
-	
-	
+
 	bool haColisao = bateuChao || colidiu;
 
 	if(haColisao){
-		if(indiceColisao != -1){
-			//colidiu com algo
-		}
 		estado = VOLTANDO;
 	}
-
 }
 
+void voltaCuboEObjeto(){
+	Cube* moveObj = new Cube(0);
+	bool colisao = indiceColisao != -1;
+
+	if(colisao){
+		moveObj = objects[indiceColisao];
+	}
+
+	PONTO* objPos = moveObj->getPos();
+
+	if(_y < 5.0f){
+		_y += velocidade;
+		if(colisao)	moveObj->move(objPos->x, _y, objPos->z);
+	}else if(_x < 5.2f){
+		_x += velocidade;
+		if(colisao) moveObj->move(_x, objPos->y, objPos->z);
+	}else if(_z > -6.0f){
+		_z -= velocidade;
+		if(colisao) moveObj->move(objPos->x, objPos->y, _z);
+	}else if(moveObj->getPos()->y > -10.0f && colisao){
+		if(colisao) moveObj->move(objPos->x, objPos->y - velocidade, objPos->z);
+	}else{
+		estado = JOGANDO;
+		indiceColisao = -1;
+	}
+}
 
 
 
@@ -174,18 +193,6 @@ void releasedZKey(unsigned char key, int x, int y){
 void desceCubo(){
 	if(_y >= yMin){
 		_y -= 1 * velocidade;
-	}
-}
-
-void voltaCuboEObjeto(){
-	if(_y < 5.0f){
-		_y += velocidade;
-	}else if(_x < 5.2f){
-		_x += velocidade;
-	}else if(_z > -6.0f){
-		_z -= velocidade;
-	}else{
-		estado = JOGANDO;
 	}
 }
 
@@ -244,24 +251,20 @@ void Draw() {
 	changeCameraPos();
 	switch (estado)	{
 		case JOGANDO:
-			cube->move(_x, _y, _z);
 			break;
 
 		case DESCENDO:
 			desceCubo();
-			cube->move(_x, _y, _z);
 			detectaColisao();
 			break;
 
 		case VOLTANDO:
 			voltaCuboEObjeto();
-			cube->move(_x, _y, _z);
 			break;
 
 		default:
 			break;
 	}
-	//cube->draw();
 
 	//objetos
 	for(Cube* cubo : objects){
