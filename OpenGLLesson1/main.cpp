@@ -12,11 +12,7 @@
 
 #define PI 3.14159265
 
-typedef struct PONTO {
-	float x;
-	float y;
-	float z;
-};
+
 
 
 
@@ -32,18 +28,19 @@ float _x;
 float _y = 5.0f;
 float _z;
 Cube* cube = new Cube(1.0f);
-Cube* obj = new Cube(1.2);
+
+
 
 float oldX = 0;
 float oldY = 0;
-
 
 // CUBOS PARA DEBUG //
 Cube* esqCube = new Cube(0.1f);
 Cube* dirCube = new Cube(0.1f);
 
-PONTO* esq = new PONTO();
-PONTO* dir = new PONTO();
+
+
+Cube* obj = new Cube(1.2);
 
 
 // OBJETOS //
@@ -62,10 +59,6 @@ float velocidade = 0.0007f;
 int windWidth = 720;
 int windHeight = 540;
 float yMin = 1.4f;
-
-
-
-
 
 
 
@@ -88,6 +81,10 @@ bool haColisao(PONTO* pontaGarra, PONTO* objCenter, float cubeLateralSize){
 	BOOL verticalInvasion = pontaGarra->y < objTop && pontaGarra->y > objBottom;
 	BOOL horizontalInvasion = pontaGarra->x > objLeft && pontaGarra->x < objRight;
 	BOOL depthInvasion = pontaGarra->z > objBack && pontaGarra->z < objFront;
+
+	if(_y < 2){//DEBUG
+		bool debug = true;
+	}
 
 
 	BOOL hasInvasion = verticalInvasion && horizontalInvasion && depthInvasion;
@@ -137,6 +134,32 @@ bool haColisao(PONTO* pontaGarra, PONTO* objCenter, float cubeLateralSize){
 	return false;
 }
 
+void detectaColisao(){
+	//TODO implementar um while que itera pelos objetos em busca de colisão. O chão também é um objeto
+
+	bool bateuChao = _y <= yMin;
+
+	bool colidiu = haColisao(esqCube->getPos(), obj->getPos(), obj->getEdgeSize());
+	
+	bool haColisao = bateuChao || colidiu;
+
+	if(haColisao){
+		//pega objeto
+		estado = VOLTANDO;
+	}
+
+}
+
+
+
+
+
+
+
+
+
+
+
 
 void changeCameraPos(){
 	glLoadIdentity();
@@ -175,24 +198,6 @@ void releasedZKey(unsigned char key, int x, int y){
 		rotateCam = false;
 }
 
-void detectaColisao(){
-	//TODO implementar um while que itera pelos objetos em busca de colisão. O chão também é um objeto
-
-	bool bateuChao = _y <= yMin;
-
-	PONTO * objPos = new PONTO();
-
-	bool colidiu = haColisao(esq, objPos, 1.2);
-	
-	bool haColisao = bateuChao || colidiu;
-
-	if(haColisao){
-		//pega objeto
-		estado = VOLTANDO;
-	}
-
-}
-
 void desceCubo(){
 	if(_y >= yMin){
 		_y -= 1 * velocidade;
@@ -209,12 +214,6 @@ void voltaCuboEObjeto(){
 	}else{
 		estado = JOGANDO;
 	}
-}
-
-void compartilhaCoordenadas(float x, float y, float z, PONTO* ponto){
-	ponto->x = x;
-	ponto->y = y;
-	ponto->z = z;
 }
 
 void drawGarra(){
@@ -244,7 +243,7 @@ void drawGarra(){
 	glRotatef(270.0, 1, 0, 0);
 	glRotatef(-180.0, 0, 1, 0);
 	glutSolidCone(0.2, coneHeight, 30, 30);
-	compartilhaCoordenadas(_x + 1.2, _y - 0.3 - coneHeight, _z, esq);//vai dar problema quando girar
+	esqCube->move(_x + 1.2, _y - 0.3 - coneHeight, _z);//DEBUG deveria ser um ponto
 
 	//draw right
 	changeCameraPos();
@@ -259,7 +258,7 @@ void drawGarra(){
 	glRotatef(-90.0, 1, 0, 0);
 	glRotatef(180.0, 0, 1, 0);
 	glutSolidCone(0.2, coneHeight, 30, 30);
-	compartilhaCoordenadas(_x - 1.2, _y - 0.3 - coneHeight, _z, dir);//vai dar problema quando girar
+	dirCube->move(_x - 1.2, _y - 0.3 - coneHeight, _z);//DEBUG deveria ser um ponto
 }
 
 void Draw() {
@@ -295,6 +294,7 @@ void Draw() {
 	//objeto
 	changeCameraPos();
 	obj->move(3, 0.3f, -3);
+	
 	obj->draw();
 
 	//chao
@@ -310,17 +310,13 @@ void Draw() {
 
 	//debug
 	changeCameraPos();
-	esqCube->move(esq->x, esq->y, esq->z);
 	esqCube->draw();
 
 	changeCameraPos();
-	dirCube->move(dir->x, dir->y, dir->z);
 	dirCube->draw();
 
 	glFlush();
 }
-
-
 
 void Initialize(int width, int height) {
 	glShadeModel(GL_SMOOTH);							// Enable Smooth Shading
@@ -350,37 +346,18 @@ void processMouseMotion(int x, int z) {
 	x -= windWidth / 2;
 	z -= windHeight/ 2;
 
-	/*if(rotateCam){
-		float temp = x;
-		x = z;
-		z = temp;
-	}*/
-
 	float deltax = 0;
 	float deltaz = 0;
 
 	
 	if(estado == JOGANDO){
-		if(rotateCam){
-			deltax = ((windWidth/40.0f - x) / 40.0f) - _x;
-			//deltaz = ( z / 40.0f) - _z;
-			deltaz = ((windHeight/40.0f - z) / 40.0f) - _z;
-
-
-			_x += deltax;
-			_z += deltaz;
-		}else{
-
 			deltax = ((windWidth/40.0f - x) / 40.0f) - _x;
 			deltaz = ((windHeight/40.0f - z) / 40.0f) - _z;
 
 			_x += deltax;
 			_z += deltaz;
-		}
 	}
 }
-
-
 
 
 int main(int iArgc, char** cppArgv) {

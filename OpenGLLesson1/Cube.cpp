@@ -1,6 +1,7 @@
 #include "Cube.h"
 
 Cube::Cube(float edgeSize){
+	this->edgeSize = edgeSize;
 	this->halfEdgeSize = edgeSize/2.0f;
 	x = 0;
 	y = 0;
@@ -11,6 +12,25 @@ void Cube::move(float x, float y, float z){
 	this->x = x;
 	this->y = y;
 	this->z = z;
+}
+
+void Cube::getPos(float* x, float* y, float* z){
+	*x = this->x;
+	*y = this->y;
+	*z = this->z;
+}
+
+PONTO* Cube::getPos(){
+	PONTO* p = new PONTO();
+	p->x = this->x;
+	p->y = this->y;
+	p->z = this->z;
+	return p;
+}
+
+
+float Cube::getEdgeSize(){
+	return edgeSize;
 }
 
 void Cube::draw(){
