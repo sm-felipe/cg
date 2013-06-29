@@ -43,7 +43,12 @@ Cube* dirCube = new Cube(0.1f);
 //[x][2] é o baixo da bounding box
 //[x][3] é o objeto propriamente dito
 Cube* objects[1];
+
+//COLISÃO
 int indiceColisao = -1;
+bool leftTouch = false;
+bool rightTouch = false;
+
 
 
 // controle da camera
@@ -95,21 +100,28 @@ bool haColisao(PONTO* pontaGarra, PONTO* objCenter, float cubeLateralSize){
 
 
 void detectaColisao(){
-
-	bool bateuChao = _y <= yMin;
-
-	bool colidiu = false;
 		
-	for(int i = 0; i < sizeOfObjects(); i++){
-		Cube* obj = objects[i];
-		colidiu = haColisao(esqCube->getPos(), obj->getPos(), obj->getEdgeSize());
-		if(colidiu){
-			indiceColisao = i;
+	int i = 0;
+	Cube* obj;
+
+	bool leftColidiu = false;//colisao esquerda
+	for(i; i < sizeOfObjects(); i++){
+		obj = objects[i];
+		leftColidiu = haColisao(esqCube->getPos(), obj->getPos(), obj->getEdgeSize());
+		if(leftColidiu){
 			break;
 		}
 	}
 
-	bool haColisao = bateuChao || colidiu;
+	bool rightColidiu = false;//colisao direita
+	rightColidiu = haColisao(dirCube->getPos(), obj->getPos(), obj->getEdgeSize());
+	if(leftColidiu && rightColidiu){
+		indiceColisao = i;
+	}
+
+	bool bateuChao = _y <= yMin;
+
+	bool haColisao = bateuChao || leftColidiu || rightColidiu ;
 
 	if(haColisao){
 		estado = VOLTANDO;
@@ -334,7 +346,7 @@ void processMouseMotion(int x, int z) {
 }
 
 void initializeObjects(){
-	objects[0] = new Cube(1.2);
+	objects[0] = new Cube(2.6);
 	objects[0]->move(3, 0.3f, -3);
 	//TODO adicionar outros objetos.
 }
