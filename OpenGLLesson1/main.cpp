@@ -10,6 +10,8 @@
 #include <glut.h>
 #include <math.h>
 
+#define PI 3.14159265
+
 typedef struct PONTO {
 	float x;
 	float y;
@@ -44,11 +46,21 @@ PONTO* dir = new PONTO();
 // OBJETOS //
 //TODO: fazer um vetor com os objetos
 
+
+// controle da camera
+float angle = 180;
+float hipotenusa = 8;
+float velocidadeRotacao = 0.1;
+bool rotateCam = false;
+
+
 // OUTROS //
 float velocidade = 0.0007f;
 int windWidth = 720;
 int windHeight = 540;
 float yMin = 1.4f;
+
+
 
 
 
@@ -122,16 +134,42 @@ bool haColisao(PONTO* pontaGarra, PONTO* objCenter, float cubeLateralSize){
 	return false;
 }
 
+
 void changeCameraPos(){
 	glLoadIdentity();
-	if(1)
-		gluLookAt(5.0f, 2, -5,
-				0.0f, 2.0f,  0.0f,
-				0.0f, 1.0f,  0.0f);
-	else
-		gluLookAt(0.0f,5.0f, -8.0,
-				0.0f, 0.0f,  0.0f,
-				0.0f, 1.0f,  0.0f);
+	
+	float x = sin(angle * PI / 180.0) * hipotenusa;
+	float z = cos(angle * PI / 180.0) * hipotenusa;
+	
+	gluLookAt(x,5.0f, z,
+		0.0f, 0.0f,  0.0f,
+		0.0f, 1.0f,  0.0f);
+
+	/*gluLookAt(5.0f, 2, -5,
+		0.0f, 2.0f,  0.0f,
+		0.0f, 1.0f,  0.0f);*/
+}
+
+void atualizaAnguloCamera(){
+	if(rotateCam){
+		if(angle < 270){
+			angle += velocidadeRotacao;
+		}
+	}else{
+		if(angle > 180){
+			angle -= velocidadeRotacao;
+		}
+	}
+}
+
+void getZKey(unsigned char key, int x, int y) {
+	if (key == 122) 
+		rotateCam = true;
+}
+
+void releasedZKey(unsigned char key, int x, int y){
+	if (key == 122) 
+		rotateCam = false;
 }
 
 void detectaColisao(){
@@ -224,6 +262,7 @@ void drawGarra(){
 void Draw() {
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);	// Clear Screen And Depth Buffer
 	
+	atualizaAnguloCamera();
 
 	drawGarra();
 
@@ -314,6 +353,8 @@ void processMouseMotion(int x, int z) {
 }
 
 
+
+
 int main(int iArgc, char** cppArgv) {
 	
 	
@@ -326,6 +367,8 @@ int main(int iArgc, char** cppArgv) {
 	glutDisplayFunc(Draw);
 	glutIdleFunc(Draw);
 
+	glutKeyboardFunc(getZKey);
+	glutKeyboardUpFunc(releasedZKey);
 	glutMouseFunc(processMouseClick);
 	glutPassiveMotionFunc(processMouseMotion);
 	glutMotionFunc(processMouseMotion);
