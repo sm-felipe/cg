@@ -140,7 +140,7 @@ void voltaCuboEObjeto(){
 
 	if(_y < 5.0f){
 		_y += velocidade;
-		if(colisao)	moveObj->move(objPos->x, _y, objPos->z);
+		if(colisao)	moveObj->move(objPos->x, _y - moveObj->halfEdgeSize, objPos->z);
 	}else if(_x < 5.2f){
 		_x += velocidade;
 		if(colisao) moveObj->move(_x, objPos->y, objPos->z);
@@ -346,7 +346,7 @@ void processMouseMotion(int x, int z) {
 }
 
 void initializeObjects(){
-	objects[0] = new Cube(2.6);
+	objects[0] = new Cube(2.78);
 	objects[0]->move(3, 0.3f, -3);
 	//TODO adicionar outros objetos.
 }
