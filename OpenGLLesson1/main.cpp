@@ -10,6 +10,12 @@
 #include <glut.h>
 #include <math.h>
 
+typedef struct PONTO {
+	float x;
+	float y;
+	float z;
+};
+
 
 
 // ESTADOS //
@@ -17,7 +23,6 @@ const int JOGANDO = 0;
 const int DESCENDO = 1;
 const int VOLTANDO =  2;
 const int SOLTANDO = 3;
-
 int estado = 0;
 
 // POSICAO DA GARRA //
@@ -25,6 +30,16 @@ float _x;
 float _y = 5.0f;
 float _z;
 Cube* cube = new Cube(1.0f);
+Cube* obj = new Cube(1.2);
+
+
+// CUBOS PARA DEBUG //
+Cube* esqCube = new Cube(0.1f);
+Cube* dirCube = new Cube(0.1f);
+
+PONTO* esq = new PONTO();
+PONTO* dir = new PONTO();
+
 
 // OBJETOS //
 //TODO: fazer um vetor com os objetos
@@ -33,53 +48,51 @@ Cube* cube = new Cube(1.0f);
 float velocidade = 0.0007f;
 int windWidth = 720;
 int windHeight = 540;
+float yMin = 1.4f;
 
 
 
-typedef struct PONTO {
-	float x;
-	float y;
-	float z;
-};
 
-void updateCubePos(PONTO* mouse, PONTO* object, float cubeLateralSize){
+
+bool haColisao(PONTO* pontaGarra, PONTO* objCenter, float cubeLateralSize){
 	float halfSide = cubeLateralSize /2.0f;
 
 	//halfSide só funciona pra cubos, preciso receber esses dados melhor
-	float objTop = object->y + halfSide;
-	float objBottom = object->y - halfSide;
-	float objLeft = object->x - halfSide;
-	float objRight = object->x + halfSide;
-	/*float objFront = object->z + halfSide;
-	float objBack = object->z - halfSide; */
+	float objTop = objCenter->y + halfSide;
+	float objBottom = objCenter->y - halfSide;
+	float objLeft = objCenter->x - halfSide;
+	float objRight = objCenter->x + halfSide;
+	float objFront = objCenter->z + halfSide;
+	float objBack = objCenter->z - halfSide; 
 
-	float newX = object->x;
-	float newY = object->y;
-	/*float newZ = object->z;*/
+	float newX = objCenter->x;
+	float newY = objCenter->y;
+	float newZ = objCenter->z;
 
 	
-	BOOL verticalInvasion = mouse->y < objTop && mouse->y > objBottom;
-	BOOL horizontalInvasion = mouse->x > objLeft && mouse->x < objRight;
-	/*BOOL depthInvasion = mouse->z > objBack && mouse->z < objFront;*/
+	BOOL verticalInvasion = pontaGarra->y < objTop && pontaGarra->y > objBottom;
+	BOOL horizontalInvasion = pontaGarra->x > objLeft && pontaGarra->x < objRight;
+	BOOL depthInvasion = pontaGarra->z > objBack && pontaGarra->z < objFront;
 
 
-	BOOL hasInvasion = verticalInvasion && horizontalInvasion/* && depthInvasion*/;
+	BOOL hasInvasion = verticalInvasion && horizontalInvasion && depthInvasion;
 
 	if(hasInvasion){
-
+		return true;
+		/*
 		float topDistance = abs(objTop - mouse->y);
 		float bottomDistance = abs(objBottom - mouse->y);
 		float leftDistance = abs(mouse->x - objLeft);
 		float rightDistance = abs( objRight - mouse->x);
-		/*float frontDistance = abs(objFront - mouse->z);
-		float backDistance = abs(objBack - mouse->z);*/
+		float frontDistance = abs(objFront - mouse->z);
+		float backDistance = abs(objBack - mouse->z);
 
-		BOOL deCima = topDistance < bottomDistance && topDistance < leftDistance && topDistance < rightDistance/* && topDistance < frontDistance && topDistance < backDistance*/;
-		BOOL deBaixo = bottomDistance < topDistance && bottomDistance < leftDistance && bottomDistance < rightDistance/* && bottomDistance < frontDistance && bottomDistance < backDistance*/;
-		BOOL daDireita = rightDistance < topDistance && rightDistance < bottomDistance && rightDistance < leftDistance /*&& rightDistance < frontDistance && rightDistance < backDistance*/;
-		BOOL daEsquerda = leftDistance < topDistance && leftDistance < bottomDistance && leftDistance < rightDistance /*&& leftDistance < frontDistance && leftDistance < backDistance*/;
-		/*BOOL daFrente = frontDistance < topDistance && frontDistance < bottomDistance && frontDistance < rightDistance && frontDistance < leftDistance && frontDistance < backDistance;
-		BOOL deTras =  backDistance < topDistance && backDistance < bottomDistance && backDistance < rightDistance && backDistance < leftDistance && backDistance < frontDistance;*/
+		BOOL deCima = topDistance < bottomDistance && topDistance < leftDistance && topDistance < rightDistance && topDistance < frontDistance && topDistance < backDistance;
+		BOOL deBaixo = bottomDistance < topDistance && bottomDistance < leftDistance && bottomDistance < rightDistance && bottomDistance < frontDistance && bottomDistance < backDistance;
+		BOOL daDireita = rightDistance < topDistance && rightDistance < bottomDistance && rightDistance < leftDistance && rightDistance < frontDistance && rightDistance < backDistance;
+		BOOL daEsquerda = leftDistance < topDistance && leftDistance < bottomDistance && leftDistance < rightDistance && leftDistance < frontDistance && leftDistance < backDistance;
+		BOOL daFrente = frontDistance < topDistance && frontDistance < bottomDistance && frontDistance < rightDistance && frontDistance < leftDistance && frontDistance < backDistance;
+		BOOL deTras =  backDistance < topDistance && backDistance < bottomDistance && backDistance < rightDistance && backDistance < leftDistance && backDistance < frontDistance;
 		
 		if(deCima){
 			newY = newY - (objTop - mouse->y);
@@ -101,15 +114,17 @@ void updateCubePos(PONTO* mouse, PONTO* object, float cubeLateralSize){
 		}*/
 
 	}
-
+	/*
 	object->x = newX;
 	object->y = newY;
 	/*object->z = newZ;*/
+
+	return false;
 }
 
 void changeCameraPos(){
 	glLoadIdentity();
-	if(0)
+	if(1)
 		gluLookAt(5.0f, 2, -5,
 				0.0f, 2.0f,  0.0f,
 				0.0f, 1.0f,  0.0f);
@@ -121,8 +136,14 @@ void changeCameraPos(){
 
 void detectaColisao(){
 	//TODO implementar um while que itera pelos objetos em busca de colisão. O chão também é um objeto
+
+	bool bateuChao = _y <= yMin;
+
+	PONTO * objPos = new PONTO();
+
+	bool colidiu = haColisao(esq, objPos, 1.2);
 	
-	bool haColisao = _y <= 1.0f;
+	bool haColisao = bateuChao || colidiu;
 
 	if(haColisao){
 		//pega objeto
@@ -132,7 +153,7 @@ void detectaColisao(){
 }
 
 void desceCubo(){
-	if(_y >= 1.0f){
+	if(_y >= yMin){
 		_y -= 1 * velocidade;
 	}
 }
@@ -149,53 +170,61 @@ void voltaCuboEObjeto(){
 	}
 }
 
+void compartilhaCoordenadas(float x, float y, float z, PONTO* ponto){
+	ponto->x = x;
+	ponto->y = y;
+	ponto->z = z;
+}
+
 void drawGarra(){
 
 	//draw center
 	changeCameraPos();
 	glColor3f(0.7,0.7,0.7);
-	glTranslatef(0, 5.5, 0);
+	glTranslatef(_x, _y + 0.5, _z);
 	glRotatef(90.0, 1, 0, 0);
     glBegin(GL_POLYGON);
 		GLUquadricObj *obj = gluNewQuadric();
 		gluCylinder(obj, 0.6, 0.6, 0.5, 30, 30);
     glEnd();
 
+	float coneHeight = 1;
+
 	//draw left
 	changeCameraPos();
 	glColor3f(1,0.7,0.7);
-	glTranslatef(1.2, 4.6, 0);
+	glTranslatef(_x + 1.2, _y - 0.4, _z);
 	glRotatef(270.0, 1, 0, 0);
 	glRotatef(-50.0, 0, 1, 0);
-	glutSolidCone(0.2, 1, 30, 30);
+	glutSolidCone(0.2, coneHeight, 30, 30);
 
 	changeCameraPos();
-	glTranslatef(1.2, 4.7, 0);
+	glTranslatef(_x + 1.2, _y - 0.3, _z);
 	glRotatef(270.0, 1, 0, 0);
 	glRotatef(-180.0, 0, 1, 0);
-	glutSolidCone(0.2, 1, 30, 30);
+	glutSolidCone(0.2, coneHeight, 30, 30);
+	compartilhaCoordenadas(_x + 1.2, _y - 0.3 - coneHeight, _z, esq);//vai dar problema quando girar
 
 	//draw right
 	changeCameraPos();
 	glColor3f(1,0.7,0.7);
-	glTranslatef(-1.2, 4.6, 0);
+	glTranslatef(_x - 1.2, _y - 0.4, _z);
 	glRotatef(-90.0, 1, 0, 0);
 	glRotatef(50.0, 0, 1, 0);
-	glutSolidCone(0.2, 1, 30, 30);
+	glutSolidCone(0.2, coneHeight, 30, 30);
 
 	changeCameraPos();
-	glTranslatef(-1.2, 4.7, 0);
+	glTranslatef(_x - 1.2, _y - 0.3, _z);
 	glRotatef(-90.0, 1, 0, 0);
 	glRotatef(180.0, 0, 1, 0);
-	glutSolidCone(0.2, 1, 30, 30);
-
+	glutSolidCone(0.2, coneHeight, 30, 30);
+	compartilhaCoordenadas(_x - 1.2, _y - 0.3 - coneHeight, _z, dir);//vai dar problema quando girar
 }
 
 void Draw() {
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);	// Clear Screen And Depth Buffer
+	
 
-	
-	
 	drawGarra();
 
 	changeCameraPos();
@@ -218,11 +247,14 @@ void Draw() {
 		default:
 			break;
 	}
-	cube->draw();
+	//cube->draw();
 
-	
+	//objeto
+	changeCameraPos();
+	obj->move(3, 0.3f, -3);
+	obj->draw();
 
-
+	//chao
 	changeCameraPos();
 	glBegin(GL_QUADS);
 		glColor3f(1.0f, 1.0f, 1.0f);
@@ -231,6 +263,16 @@ void Draw() {
 		glVertex3f(6, 0, 6);
 		glVertex3f(6, 0, -6);
 	glEnd();
+
+
+	//debug
+	changeCameraPos();
+	esqCube->move(esq->x, esq->y, esq->z);
+	esqCube->draw();
+
+	changeCameraPos();
+	dirCube->move(dir->x, dir->y, dir->z);
+	dirCube->draw();
 
 	glFlush();
 }
