@@ -34,6 +34,9 @@ float _z;
 Cube* cube = new Cube(1.0f);
 Cube* obj = new Cube(1.2);
 
+float oldX = 0;
+float oldY = 0;
+
 
 // CUBOS PARA DEBUG //
 Cube* esqCube = new Cube(0.1f);
@@ -262,6 +265,7 @@ void drawGarra(){
 void Draw() {
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);	// Clear Screen And Depth Buffer
 	
+	
 	atualizaAnguloCamera();
 
 	drawGarra();
@@ -345,10 +349,32 @@ void processMouseClick(int button, int state, int x, int y) {
 void processMouseMotion(int x, int z) {
 	x -= windWidth / 2;
 	z -= windHeight/ 2;
+
+	if(rotateCam){
+		float temp = x;
+		x = z;
+		z = temp;
+	}
+
+	float deltax = 0;
+	float deltaz = 0;
+
 	
 	if(estado == JOGANDO){
-		_x = (windHeight/30.0f - x) /30.0f;
-		_z = (windHeight/30.0f - z) /30.0f;
+		if(rotateCam){
+			deltax = ((windWidth/40.0f - x) / 40.0f) - _x;
+			deltaz = ( z / 40.0f) - _z;
+
+			_x += deltax;
+			_z += deltaz;
+		}else{
+
+			deltax = ((windWidth/40.0f - x) / 40.0f) - _x;
+			deltaz = ((windHeight/40.0f - z) / 40.0f) - _z;
+
+			_x += deltax;
+			_z += deltaz;
+		}
 	}
 }
 
@@ -371,6 +397,7 @@ int main(int iArgc, char** cppArgv) {
 	glutKeyboardUpFunc(releasedZKey);
 	glutMouseFunc(processMouseClick);
 	glutPassiveMotionFunc(processMouseMotion);
+
 	glutMotionFunc(processMouseMotion);
 	glutMainLoop();
 	FreeConsole();
