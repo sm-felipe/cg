@@ -39,12 +39,12 @@ Cube* esqCube = new Cube(0.1f);
 Cube* dirCube = new Cube(0.1f);
 
 
-
-Cube* obj = new Cube(1.2);
-
-
 // OBJETOS //
-//TODO: fazer um vetor com os objetos
+//TODO: objetos deveria ser objects[x][3] onde 
+//[x][1] é o topo da bounding box
+//[x][2] é o baixo da bounding box
+//[x][3] é o objeto propriamente dito
+Cube* objects[1];
 
 
 // controle da camera
@@ -60,6 +60,9 @@ int windWidth = 720;
 int windHeight = 540;
 float yMin = 1.4f;
 
+int sizeOfObjects(){
+	return sizeof(objects) / sizeof(Cube*);
+}
 
 
 bool haColisao(PONTO* pontaGarra, PONTO* objCenter, float cubeLateralSize){
@@ -73,78 +76,48 @@ bool haColisao(PONTO* pontaGarra, PONTO* objCenter, float cubeLateralSize){
 	float objFront = objCenter->z + halfSide;
 	float objBack = objCenter->z - halfSide; 
 
-	float newX = objCenter->x;
+/*	float newX = objCenter->x;
 	float newY = objCenter->y;
-	float newZ = objCenter->z;
+	float newZ = objCenter->z;*/
 
-	
 	BOOL verticalInvasion = pontaGarra->y < objTop && pontaGarra->y > objBottom;
 	BOOL horizontalInvasion = pontaGarra->x > objLeft && pontaGarra->x < objRight;
 	BOOL depthInvasion = pontaGarra->z > objBack && pontaGarra->z < objFront;
-
-	if(_y < 2){//DEBUG
-		bool debug = true;
-	}
-
 
 	BOOL hasInvasion = verticalInvasion && horizontalInvasion && depthInvasion;
 
 	if(hasInvasion){
 		return true;
-		/*
-		float topDistance = abs(objTop - mouse->y);
-		float bottomDistance = abs(objBottom - mouse->y);
-		float leftDistance = abs(mouse->x - objLeft);
-		float rightDistance = abs( objRight - mouse->x);
-		float frontDistance = abs(objFront - mouse->z);
-		float backDistance = abs(objBack - mouse->z);
-
-		BOOL deCima = topDistance < bottomDistance && topDistance < leftDistance && topDistance < rightDistance && topDistance < frontDistance && topDistance < backDistance;
-		BOOL deBaixo = bottomDistance < topDistance && bottomDistance < leftDistance && bottomDistance < rightDistance && bottomDistance < frontDistance && bottomDistance < backDistance;
-		BOOL daDireita = rightDistance < topDistance && rightDistance < bottomDistance && rightDistance < leftDistance && rightDistance < frontDistance && rightDistance < backDistance;
-		BOOL daEsquerda = leftDistance < topDistance && leftDistance < bottomDistance && leftDistance < rightDistance && leftDistance < frontDistance && leftDistance < backDistance;
-		BOOL daFrente = frontDistance < topDistance && frontDistance < bottomDistance && frontDistance < rightDistance && frontDistance < leftDistance && frontDistance < backDistance;
-		BOOL deTras =  backDistance < topDistance && backDistance < bottomDistance && backDistance < rightDistance && backDistance < leftDistance && backDistance < frontDistance;
-		
-		if(deCima){
-			newY = newY - (objTop - mouse->y);
-		}
-		if(deBaixo){
-			newY = newY + (mouse->y - objBottom);
-		}
-		if(daDireita){
-			newX = newX - (objRight - mouse->x);
-		}
-		if(daEsquerda){
-			newX = newX + (mouse->x - objLeft);
-		}
-		/*if(daFrente){
-			newZ = newZ - (objFront - mouse->z);
-		}
-		if(deTras){
-			newZ = newZ + (mouse->z - objBack);
-		}*/
-
 	}
-	/*
-	object->x = newX;
-	object->y = newY;
-	/*object->z = newZ;*/
 
 	return false;
 }
 
+
+
 void detectaColisao(){
-	//TODO implementar um while que itera pelos objetos em busca de colisão. O chão também é um objeto
 
 	bool bateuChao = _y <= yMin;
 
-	bool colidiu = haColisao(esqCube->getPos(), obj->getPos(), obj->getEdgeSize());
+	bool colidiu = false;
+	int indiceColisao = -1;
+		
+	for(int i = 0; i < sizeOfObjects(); i++){
+		Cube* obj = objects[i];
+		colidiu = haColisao(esqCube->getPos(), obj->getPos(), obj->getEdgeSize());
+		if(colidiu){
+			indiceColisao = i;
+			break;
+		}
+	}
+	
 	
 	bool haColisao = bateuChao || colidiu;
 
 	if(haColisao){
-		//pega objeto
+		if(indiceColisao != -1){
+			//colidiu com algo
+		}
 		estado = VOLTANDO;
 	}
 
@@ -264,7 +237,6 @@ void drawGarra(){
 void Draw() {
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);	// Clear Screen And Depth Buffer
 	
-	
 	atualizaAnguloCamera();
 
 	drawGarra();
@@ -291,11 +263,11 @@ void Draw() {
 	}
 	//cube->draw();
 
-	//objeto
-	changeCameraPos();
-	obj->move(3, 0.3f, -3);
-	
-	obj->draw();
+	//objetos
+	for(Cube* cubo : objects){
+		changeCameraPos();
+		cubo->draw();
+	}
 
 	//chao
 	changeCameraPos();
@@ -306,7 +278,6 @@ void Draw() {
 		glVertex3f(6, 0, 6);
 		glVertex3f(6, 0, -6);
 	glEnd();
-
 
 	//debug
 	changeCameraPos();
@@ -359,9 +330,16 @@ void processMouseMotion(int x, int z) {
 	}
 }
 
+void initializeObjects(){
+	objects[0] = new Cube(1.2);
+	objects[0]->move(3, 0.3f, -3);
+	//TODO adicionar outros objetos.
+}
+
 
 int main(int iArgc, char** cppArgv) {
-	
+
+	initializeObjects();	
 	
 	glutInit(&iArgc, cppArgv);
 	glutInitDisplayMode(GLUT_SINGLE | GLUT_RGB |GLUT_DEPTH);
