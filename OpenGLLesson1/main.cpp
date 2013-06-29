@@ -350,11 +350,11 @@ void processMouseMotion(int x, int z) {
 	x -= windWidth / 2;
 	z -= windHeight/ 2;
 
-	if(rotateCam){
+	/*if(rotateCam){
 		float temp = x;
 		x = z;
 		z = temp;
-	}
+	}*/
 
 	float deltax = 0;
 	float deltaz = 0;
@@ -363,7 +363,9 @@ void processMouseMotion(int x, int z) {
 	if(estado == JOGANDO){
 		if(rotateCam){
 			deltax = ((windWidth/40.0f - x) / 40.0f) - _x;
-			deltaz = ( z / 40.0f) - _z;
+			//deltaz = ( z / 40.0f) - _z;
+			deltaz = ((windHeight/40.0f - z) / 40.0f) - _z;
+
 
 			_x += deltax;
 			_z += deltaz;
