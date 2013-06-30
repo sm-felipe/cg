@@ -38,7 +38,7 @@ Cube* esqCube = new Cube(0.1f);
 Cube* dirCube = new Cube(0.1f);
 
 // OBJETOS //
-const int numObjetos = 3;
+const int numObjetos = 4;
 Parallelepiped* boxes[numObjetos];
 Shape* shapes[numObjetos];
 
@@ -61,7 +61,7 @@ GLuint		wood;
 GLuint		metal;
 
 //LUZ //
-GLfloat LightAmbient[]= { 0.4f, 0.4f, 0.2f, 1.0f }; //TODO: renomear isso
+GLfloat LightAmbient[]= { 0.4f, 0.4f, 0.2f, 1.0f };
 GLfloat LightDiffuse[]= { 1.0f, 1.0f, 1.0f, 1.0f }; 
 GLfloat LightPosition[]={ 0.0f, 6.0f, -3.0f, 1.0f };
 
@@ -463,7 +463,7 @@ void initializeObjects(){
 	boxes[0]->move(3, 0.8, -3);
 	shapes[0] = new Shape(consts->TEAPOT);
 
-	boxes[1] = new Parallelepiped(2.7, 2.7, 2.7);
+	boxes[1] = new Parallelepiped(2.8, 2.8, 2.8);
 	boxes[1]->move(-3, 1.24, -4);
 	shapes[1] = new Shape(consts->SPHERE);
 
@@ -471,7 +471,9 @@ void initializeObjects(){
 	boxes[2]->move(-3, 1.24, 4);
 	shapes[2] = new Shape(consts->CUBE);
 
-
+	boxes[3] = new Parallelepiped(3.2, 3.2, 3.2);
+	boxes[3]->move(2, 2.24, 2);
+	shapes[3] = new Shape(consts->CONE);
 
 	//TODO adicionar outros objetos.
 }

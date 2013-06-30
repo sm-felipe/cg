@@ -129,7 +129,7 @@ public:
 	const static int TEAPOT = 1;
 	const static int CUBE = 2;
 	const static int SPHERE = 3;
-	const static int PARALLEL = 4;
+	const static int CONE = 4;
 
 
 private:
