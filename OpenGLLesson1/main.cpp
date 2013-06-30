@@ -38,7 +38,7 @@ Cube* esqCube = new Cube(0.1f);
 Cube* dirCube = new Cube(0.1f);
 
 // OBJETOS //
-const int numObjetos = 2;
+const int numObjetos = 3;
 Parallelepiped* boxes[numObjetos];
 Shape* shapes[numObjetos];
 
@@ -187,8 +187,6 @@ void voltaCuboEObjeto(){
 	bool colisao = indiceColisao != -1;
 	PONTO* objCenter;
 
-	
-
 	if(colisao){
 		moveObj = boxes[indiceColisao];
 		objCenter = moveObj->getPos();
@@ -208,6 +206,7 @@ void voltaCuboEObjeto(){
 		if(colisao) moveObj->move(objCenter->x, objCenter->y - velocidadeMov, objCenter->z);
 	}else{
 		estado = JOGANDO;
+		shapes[indiceColisao]->show = false;
 		indiceColisao = -1;
 	}
 }
@@ -367,14 +366,16 @@ void Draw() {
 
 	//objetos
 	for(int i = 0; i < sizeOfBoxes(); i++){
-		changeCameraPos();
-		Parallelepiped* parall = boxes[i];
-		if(estado == VOLTANDO && i == indiceColisao){
-			parall->setAngle(-garraAngle);
+		if(shapes[i]->show){
+			changeCameraPos();
+			Parallelepiped* parall = boxes[i];
+			if(estado == VOLTANDO && i == indiceColisao){
+				parall->setAngle(-garraAngle);
+			}
+			//parall->draw();
+			parall->calculateDraw();
+			shapes[i]->draw(0);
 		}
-		//parall->draw();
-		parall->calculateDraw();
-		shapes[i]->draw(0);
 	}
 
 	//chao
@@ -466,6 +467,9 @@ void initializeObjects(){
 	boxes[1]->move(-3, 1.24, -4);
 	shapes[1] = new Shape(consts->SPHERE);
 
+	boxes[2] = new Parallelepiped(2.6, 2.6, 2.6);
+	boxes[2]->move(-3, 1.24, 4);
+	shapes[2] = new Shape(consts->CUBE);
 
 
 

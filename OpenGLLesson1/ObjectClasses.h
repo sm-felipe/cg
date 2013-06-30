@@ -122,12 +122,15 @@ public:
 
 	int type;
 
+	bool show;
+
 	void draw(GLfloat angle);
 
 	const static int TEAPOT = 1;
 	const static int CUBE = 2;
 	const static int SPHERE = 3;
 	const static int PARALLEL = 4;
+
 
 private:
 	
