@@ -27,6 +27,7 @@ public:
 
 	Cube(float edgeSize);
 
+
 	void move(float x, float y, float z);
 
 	void getPos(float* x, float* y, float* z);
@@ -35,11 +36,15 @@ public:
 
 	float getEdgeSize();
 
+	void setTexture(GLuint textureID);
+
 	void draw();
 
 private:
 	float halfEdgeSize;
 	float edgeSize;
+	GLuint textureID;
+
 
 };
 

@@ -352,7 +352,11 @@ void Draw() {
 bool Initialize(int width, int height) {
 	if(!LoadGLTextures()){
 		return false;
+	}else{
+		esqCube->setTexture(metal);
+		dirCube->setTexture(metal);
 	}
+
 
 	glEnable(GL_TEXTURE_2D);
 	glShadeModel(GL_SMOOTH);							// Enable Smooth Shading
@@ -403,7 +407,6 @@ void processMouseMotion(int x, int z) {
 }
 
 void initializeObjects(){
-
 	boxes[0] = new Parallelepiped(1, 4, 4);
 	boxes[0]->move(3, 0.3f, -3);
 	//TODO adicionar outros objetos.
