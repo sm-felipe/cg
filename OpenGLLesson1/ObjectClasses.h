@@ -10,10 +10,15 @@ struct PONTO {
 
 class ObjectClass {
 
+public:
+	void move(float x, float y, float z);
+
+	void draw();
+
 };
 
 
-class Cube : ObjectClass
+class Cube : public ObjectClass
 {
 public:
 	float x;
@@ -38,7 +43,7 @@ private:
 
 };
 
-class Parallelepiped : ObjectClass
+class Parallelepiped : public ObjectClass
 {
 public:
 
@@ -67,5 +72,34 @@ private:
 	float height;
 	float width;
 	float depth;
+
+};
+
+class Garra : ObjectClass
+{
+
+public:
+
+	float x;
+	float y;
+	float z;
+
+	Garra(float x, float y, float z, void (*callback)(void));
+
+	void move(float x, float y, float z);
+
+	PONTO* getPos();
+
+	PONTO* getLeft();
+
+	PONTO* getRight();
+
+	void draw();
+
+private:
+	
+	PONTO* left;
+	PONTO* right;
+	void (*changeCameraFunc)();
 
 };

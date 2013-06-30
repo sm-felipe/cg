@@ -6,14 +6,11 @@
 // Copyright 2010 XoaX - For personal use only, not for distribution
 
 
-#include "Cube.h"
+#include "ObjectClasses.h"
 #include <glut.h>
 #include <math.h>
 
 #define PI 3.14159265
-
-
-
 
 
 // ESTADOS //
@@ -29,20 +26,14 @@ float _y = 5.0f;
 float _z;
 
 
-float oldX = 0;
-float oldY = 0;
-
 // CUBOS PARA DEBUG //
 Cube* esqCube = new Cube(0.1f);
 Cube* dirCube = new Cube(0.1f);
 
-
 // OBJETOS //
-//TODO: objetos deveria ser objects[x][3] onde 
-//[x][1] é o topo da bounding box
-//[x][2] é o baixo da bounding box
-//[x][3] é o objeto propriamente dito
-Cube* objects[1];
+const int numObjetos = 1;
+Parallelepiped* boxes[numObjetos];
+//falta fazer o vetor de objetos de fato
 
 //COLISÃO
 int indiceColisao = -1;
@@ -64,25 +55,24 @@ int windWidth = 720;
 int windHeight = 540;
 float yMin = 1.4f;
 
-int sizeOfObjects(){
-	return sizeof(objects) / sizeof(Cube*);
+int sizeOfBoxes(){
+	return sizeof(boxes) / sizeof(Cube*);
 }
 
 
-bool haColisao(PONTO* pontaGarra, PONTO* objCenter, float cubeLateralSize){
-	float halfSide = cubeLateralSize /2.0f;
+bool haColisao(PONTO* pontaGarra, Parallelepiped* box){
+	float xHalfSize = box->getWidth()/2.0f;
+	float yHalfSize = box->getHeight()/2.0f;
+	float zHalfSize = box->getDepth()/2.0f;
 
-	//halfSide só funciona pra cubos, preciso receber esses dados melhor
-	float objTop = objCenter->y + halfSide;
-	float objBottom = objCenter->y - halfSide;
-	float objLeft = objCenter->x - halfSide;
-	float objRight = objCenter->x + halfSide;
-	float objFront = objCenter->z + halfSide;
-	float objBack = objCenter->z - halfSide; 
+	PONTO* objCenter = box->getPos();
 
-/*	float newX = objCenter->x;
-	float newY = objCenter->y;
-	float newZ = objCenter->z;*/
+	float objTop = objCenter->y + yHalfSize;
+	float objBottom = objCenter->y - yHalfSize;
+	float objLeft = objCenter->x - xHalfSize;
+	float objRight = objCenter->x + xHalfSize;
+	float objFront = objCenter->z + zHalfSize;
+	float objBack = objCenter->z - zHalfSize; 
 
 	BOOL verticalInvasion = pontaGarra->y < objTop && pontaGarra->y > objBottom;
 	BOOL horizontalInvasion = pontaGarra->x > objLeft && pontaGarra->x < objRight;
@@ -102,19 +92,23 @@ bool haColisao(PONTO* pontaGarra, PONTO* objCenter, float cubeLateralSize){
 void detectaColisao(){
 		
 	int i = 0;
-	Cube* obj;
+	Parallelepiped* box;
 
 	bool leftColidiu = false;//colisao esquerda
-	for(i; i < sizeOfObjects(); i++){
-		obj = objects[i];
-		leftColidiu = haColisao(esqCube->getPos(), obj->getPos(), obj->getEdgeSize());
+	for(i; i < sizeOfBoxes(); i++){
+		box = boxes[i];
+		leftColidiu = haColisao(esqCube->getPos(), box);
 		if(leftColidiu){
 			break;
 		}
 	}
 
+	if(leftColidiu){
+		bool debug = true;
+	}
+
 	bool rightColidiu = false;//colisao direita
-	rightColidiu = haColisao(dirCube->getPos(), obj->getPos(), obj->getEdgeSize());
+	rightColidiu = haColisao(dirCube->getPos(), box);
 	if(leftColidiu && rightColidiu){
 		indiceColisao = i;
 	}
@@ -129,18 +123,21 @@ void detectaColisao(){
 }
 
 void voltaCuboEObjeto(){
-	Cube* moveObj = new Cube(0);
+	Parallelepiped* moveObj = new Parallelepiped(0, 0 ,0);
 	bool colisao = indiceColisao != -1;
+	PONTO* objPos;
 
 	if(colisao){
-		moveObj = objects[indiceColisao];
+		moveObj = boxes[indiceColisao];
+		objPos = moveObj->getPos();
 	}
 
-	PONTO* objPos = moveObj->getPos();
+	
 
+	//TODO ajustar isso pra fazer mudanças em x e z de forma mais suave
 	if(_y < 5.0f){
 		_y += velocidade;
-		if(colisao)	moveObj->move(objPos->x, _y - moveObj->halfEdgeSize, objPos->z);
+		if(colisao)	moveObj->move(objPos->x, _y - (moveObj->getHeight()/2.0f), objPos->z);
 	}else if(_x < 5.2f){
 		_x += velocidade;
 		if(colisao) moveObj->move(_x, objPos->y, objPos->z);
@@ -209,7 +206,6 @@ void desceCubo(){
 }
 
 void drawGarra(){
-
 	//draw center
 	changeCameraPos();
 	glColor3f(0.7,0.7,0.7);
@@ -251,6 +247,7 @@ void drawGarra(){
 	glRotatef(180.0, 0, 1, 0);
 	glutSolidCone(0.2, coneHeight, 30, 30);
 	dirCube->move(_x - 1.2, _y - 0.3 - coneHeight, _z);//DEBUG deveria ser um ponto
+
 }
 
 void Draw() {
@@ -279,9 +276,9 @@ void Draw() {
 	}
 
 	//objetos
-	for(Cube* cubo : objects){
+	for(Parallelepiped* box : boxes){
 		changeCameraPos();
-		cubo->draw();
+		box->draw();
 	}
 
 	//chao
@@ -346,8 +343,9 @@ void processMouseMotion(int x, int z) {
 }
 
 void initializeObjects(){
-	objects[0] = new Cube(2.78);
-	objects[0]->move(3, 0.3f, -3);
+
+	boxes[0] = new Parallelepiped(1, 4, 4);
+	boxes[0]->move(3, 0.3f, -3);
 	//TODO adicionar outros objetos.
 }
 

@@ -1,4 +1,4 @@
-#include "Cube.h"
+#include "ObjectClasses.h"
 
 Cube::Cube(float edgeSize){
 	this->edgeSize = edgeSize;
