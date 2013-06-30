@@ -56,9 +56,10 @@ GLuint		wood;
 GLuint		metal;
 
 //LUZ
-GLfloat LightAmbient[]= { 0.5f, 0.5f, 0.5f, 1.0f }; //TODO: renomear isso
+GLfloat LightAmbient[]= { 0.4f, 0.4f, 0.2f, 1.0f }; //TODO: renomear isso
 GLfloat LightDiffuse[]= { 1.0f, 1.0f, 1.0f, 1.0f }; 
-GLfloat LightPosition[]={ 0.0f, 0.0f, 2.0f, 1.0f };
+GLfloat LightPosition[]={ 0.0f, 6.0f, -3.0f, 1.0f };
+
 
 // OUTROS //
 float velocidade = 0.0007f;
@@ -304,6 +305,17 @@ void drawFloor(){
 	glEnd();
 
 }
+
+void drawLightSource(){
+	GLUquadricObj* Sphere;
+	glBindTexture(GL_TEXTURE_2D, -1);
+	glTranslatef(LightPosition[0],LightPosition[1] ,LightPosition[2] +3.7);
+	Sphere=gluNewQuadric();
+	gluSphere(Sphere,0.3,30,30);
+	gluDeleteQuadric(Sphere);
+	
+}
+
 void Draw() {
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);	// Clear Screen And Depth Buffer
 	
@@ -339,6 +351,9 @@ void Draw() {
 	changeCameraPos();
 	drawFloor();
 
+	changeCameraPos();
+	drawLightSource();
+
 	//debug
 	changeCameraPos();
 	esqCube->draw();
@@ -370,6 +385,8 @@ bool Initialize(int width, int height) {
 	glLightfv(GL_LIGHT1, GL_DIFFUSE, LightDiffuse);		// Setup The Diffuse Light
 	glLightfv(GL_LIGHT1, GL_POSITION,LightPosition);	// Position The Light
 	glEnable(GL_LIGHT1);								// Enable Light One
+	glEnable(GL_LIGHTING);
+	glEnable(GL_COLOR_MATERIAL);
 
 	glMatrixMode(GL_PROJECTION);
 	glLoadIdentity();
