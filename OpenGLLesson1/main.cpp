@@ -5,10 +5,12 @@
 //
 // Copyright 2010 XoaX - For personal use only, not for distribution
 
-
+#include <Windows.h>
 #include "ObjectClasses.h"
+#include <stdio.h>
 #include <glut.h>
 #include <math.h>
+#include "SOIL.h"
 
 #define PI 3.14159265
 
@@ -48,6 +50,9 @@ float hipotenusa = 8;
 float velocidadeRotacao = 0.1;
 bool rotateCam = false;
 
+//TEXTURA
+GLuint      texture[2]; 
+
 
 // OUTROS //
 float velocidade = 0.0007f;
@@ -59,6 +64,37 @@ int sizeOfBoxes(){
 	return sizeof(boxes) / sizeof(Cube*);
 }
 
+int LoadGLTextures()                                    // Load Bitmaps And Convert To Textures
+{
+    //load an image file directly as a new OpenGL texture 
+    texture[0] = SOIL_load_OGL_texture
+        (
+        "floor.bmp",
+        SOIL_LOAD_AUTO,
+        SOIL_CREATE_NEW_ID,
+        SOIL_FLAG_INVERT_Y
+        );
+ 
+    // Typical Texture Generation Using Data From The Bitmap
+    glBindTexture(GL_TEXTURE_2D, texture[0]);
+    glTexParameteri(GL_TEXTURE_2D,GL_TEXTURE_MIN_FILTER,GL_LINEAR);
+    glTexParameteri(GL_TEXTURE_2D,GL_TEXTURE_MAG_FILTER,GL_LINEAR);
+ 
+	texture[1] = SOIL_load_OGL_texture
+        (
+        "wood.bmp",
+        SOIL_LOAD_AUTO,
+        SOIL_CREATE_NEW_ID,
+        SOIL_FLAG_INVERT_Y
+        );
+ 
+    // Typical Texture Generation Using Data From The Bitmap
+    glBindTexture(GL_TEXTURE_2D, texture[1]);
+    glTexParameteri(GL_TEXTURE_2D,GL_TEXTURE_MIN_FILTER,GL_LINEAR);
+    glTexParameteri(GL_TEXTURE_2D,GL_TEXTURE_MAG_FILTER,GL_LINEAR);
+
+    return true;                                        // Return Success
+}
 
 bool haColisao(PONTO* pontaGarra, Parallelepiped* box){
 	float xHalfSize = box->getWidth()/2.0f;
@@ -172,7 +208,7 @@ void changeCameraPos(){
 		0.0f, 0.0f,  0.0f,
 		0.0f, 1.0f,  0.0f);
 
-	/*gluLookAt(5.0f, 2, -5,
+	/*gluLookAt(5.0f, -2, -5,
 		0.0f, 2.0f,  0.0f,
 		0.0f, 1.0f,  0.0f);*/
 }
@@ -250,6 +286,17 @@ void drawGarra(){
 
 }
 
+void drawFloor(){
+	glBindTexture(GL_TEXTURE_2D, texture[0]);
+	glBegin(GL_QUADS);
+		glColor3f(1.0f, 1.0f, 1.0f);
+		glTexCoord2f(0.0f, 0.0f);glVertex3f(-6, 0, -6);
+		glTexCoord2f(1.0f, 0.0f);glVertex3f(-6, 0, 6);
+		glTexCoord2f(1.0f, 1.0f);glVertex3f(6, 0, 6);
+		glTexCoord2f(0.0f, 1.0f);glVertex3f(6, 0, -6);
+	glEnd();
+
+}
 void Draw() {
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);	// Clear Screen And Depth Buffer
 	
@@ -283,13 +330,7 @@ void Draw() {
 
 	//chao
 	changeCameraPos();
-	glBegin(GL_QUADS);
-		glColor3f(1.0f, 1.0f, 1.0f);
-		glVertex3f(-6, 0, -6);
-		glVertex3f(-6, 0, 6);
-		glVertex3f(6, 0, 6);
-		glVertex3f(6, 0, -6);
-	glEnd();
+	drawFloor();
 
 	//debug
 	changeCameraPos();
@@ -302,6 +343,9 @@ void Draw() {
 }
 
 void Initialize(int width, int height) {
+	LoadGLTextures();
+
+	glEnable(GL_TEXTURE_2D);
 	glShadeModel(GL_SMOOTH);							// Enable Smooth Shading
 	glClearColor(0.0, 0.0, 0.0, 0.5f);					// Black Background
 	glClearDepth(1.0f);									// Depth Buffer Setup
