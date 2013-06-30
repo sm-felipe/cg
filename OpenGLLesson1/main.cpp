@@ -26,28 +26,30 @@ float _x;
 float _y = 5.0f;
 float _z;
 
+float yMin = 1.4f;
+
+float velocidadeMov = 0.003f;
+
 float garraAngle = 0;
 float garraHipotenusa = 1.2f;
 float garraVelocidadeRotacao = 0.2f;
-
-float velocidadeMov = 0.003f;
 
 Cube* esqCube = new Cube(0.1f);
 Cube* dirCube = new Cube(0.1f);
 
 // OBJETOS //
-const int numObjetos = 1;
+const int numObjetos = 2;
 Parallelepiped* boxes[numObjetos];
 Shape* shapes[numObjetos];
 
 
-//COLISÃO
+//COLISÃO //
 int indiceColisao = -1;
 bool leftTouch = false;
 bool rightTouch = false;
 
 
-// controle da camera
+// CONTROLE DA CAMERA //
 float angle = 180;
 float hipotenusa = 8;
 float velocidadeRotacao = 0.2;
@@ -58,17 +60,16 @@ GLuint      chao;
 GLuint		wood;
 GLuint		metal;
 
-//LUZ
+//LUZ //
 GLfloat LightAmbient[]= { 0.4f, 0.4f, 0.2f, 1.0f }; //TODO: renomear isso
 GLfloat LightDiffuse[]= { 1.0f, 1.0f, 1.0f, 1.0f }; 
 GLfloat LightPosition[]={ 0.0f, 6.0f, -3.0f, 1.0f };
 
 
 // OUTROS //
-
 int windWidth = 720;
 int windHeight = 540;
-float yMin = 1.4f;
+
 
 int sizeOfBoxes(){
 	return sizeof(boxes) / sizeof(Cube*);
@@ -127,7 +128,6 @@ bool haColisao(PONTO* pontaGarra, Parallelepiped* box){
 }
 
 
-
 void detectaColisao(){
 		
 	int i = 0;
@@ -166,6 +166,7 @@ void centralizaObj(){
 		boxes[indiceColisao]->move(_x, _y, _z);
 	}
 }
+
 void changeCameraPos(){
 	glLoadIdentity();
 	
@@ -176,7 +177,7 @@ void changeCameraPos(){
 		0.0f, 0.0f,  0.0f,
 		0.0f, 1.0f,  0.0f);
 
-	/*gluLookAt(5.0f, -2, -5,
+	/*gluLookAt(0.0f, 1.22, -5,
 		0.0f, 2.0f,  0.0f,
 		0.0f, 1.0f,  0.0f);*/
 }
@@ -452,10 +453,21 @@ void processMouseMotion(int x, int z) {
 	}
 }
 
+
+
 void initializeObjects(){
+	Shape* consts = new Shape(0);
+
 	boxes[0] = new Parallelepiped(1.5, 3, 1.95);
-	boxes[0]->move(3, 0.3f, -3);
-	shapes[0] = new Shape(1);
+	boxes[0]->move(3, 0.8, -3);
+	shapes[0] = new Shape(consts->TEAPOT);
+
+	boxes[1] = new Parallelepiped(2.7, 2.7, 2.7);
+	boxes[1]->move(-3, 1.24, -4);
+	shapes[1] = new Shape(consts->SPHERE);
+
+
+
 
 	//TODO adicionar outros objetos.
 }
