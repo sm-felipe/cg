@@ -290,6 +290,8 @@ void drawGarra(){
 
 }
 
+
+
 void drawFloor(){
 	glBindTexture(GL_TEXTURE_2D, chao);
 	glBegin(GL_QUADS);
