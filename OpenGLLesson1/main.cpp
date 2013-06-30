@@ -51,8 +51,12 @@ float velocidadeRotacao = 0.1;
 bool rotateCam = false;
 
 //TEXTURA
-GLuint      texture[2]; 
+GLuint      texture[3]; 
 
+//LUZ
+GLfloat LightAmbient[]= { 0.5f, 0.5f, 0.5f, 1.0f }; //TODO: renomear isso
+GLfloat LightDiffuse[]= { 1.0f, 1.0f, 1.0f, 1.0f }; 
+GLfloat LightPosition[]={ 0.0f, 0.0f, 2.0f, 1.0f };
 
 // OUTROS //
 float velocidade = 0.0007f;
@@ -64,33 +68,33 @@ int sizeOfBoxes(){
 	return sizeof(boxes) / sizeof(Cube*);
 }
 
+bool loadGLTexture(char* name, int pos){
+	//load an image file directly as a new OpenGL texture 
+    texture[pos] = SOIL_load_OGL_texture
+        (
+        name,
+        SOIL_LOAD_AUTO,
+        SOIL_CREATE_NEW_ID,
+        SOIL_FLAG_INVERT_Y
+        );
+
+	 if(texture[0] == 0)
+        return false;
+ 
+    // Typical Texture Generation Using Data From The Bitmap
+    glBindTexture(GL_TEXTURE_2D, texture[pos]);
+
+	return true;
+}
+
 int LoadGLTextures()                                    // Load Bitmaps And Convert To Textures
 {
-    //load an image file directly as a new OpenGL texture 
-    texture[0] = SOIL_load_OGL_texture
-        (
-        "floor.bmp",
-        SOIL_LOAD_AUTO,
-        SOIL_CREATE_NEW_ID,
-        SOIL_FLAG_INVERT_Y
-        );
- 
-    // Typical Texture Generation Using Data From The Bitmap
-    glBindTexture(GL_TEXTURE_2D, texture[0]);
-    glTexParameteri(GL_TEXTURE_2D,GL_TEXTURE_MIN_FILTER,GL_LINEAR);
-    glTexParameteri(GL_TEXTURE_2D,GL_TEXTURE_MAG_FILTER,GL_LINEAR);
- 
-	texture[1] = SOIL_load_OGL_texture
-        (
-        "wood.bmp",
-        SOIL_LOAD_AUTO,
-        SOIL_CREATE_NEW_ID,
-        SOIL_FLAG_INVERT_Y
-        );
- 
-    // Typical Texture Generation Using Data From The Bitmap
-    glBindTexture(GL_TEXTURE_2D, texture[1]);
-    glTexParameteri(GL_TEXTURE_2D,GL_TEXTURE_MIN_FILTER,GL_LINEAR);
+	bool result = loadGLTexture("floor.bmp", 0);
+	if(result) loadGLTexture("wood.bmp", 1);
+	if (result) loadGLTexture("metal.bmp", 2);
+
+	if(!result) return false;
+	glTexParameteri(GL_TEXTURE_2D,GL_TEXTURE_MIN_FILTER,GL_LINEAR);
     glTexParameteri(GL_TEXTURE_2D,GL_TEXTURE_MAG_FILTER,GL_LINEAR);
 
     return true;                                        // Return Success
@@ -189,15 +193,6 @@ void voltaCuboEObjeto(){
 }
 
 
-
-
-
-
-
-
-
-
-
 void changeCameraPos(){
 	glLoadIdentity();
 	
@@ -290,6 +285,7 @@ void drawFloor(){
 	glBindTexture(GL_TEXTURE_2D, texture[0]);
 	glBegin(GL_QUADS);
 		glColor3f(1.0f, 1.0f, 1.0f);
+		glNormal3f( 0.0f, 1.0f, 0.0f);
 		glTexCoord2f(0.0f, 0.0f);glVertex3f(-6, 0, -6);
 		glTexCoord2f(1.0f, 0.0f);glVertex3f(-6, 0, 6);
 		glTexCoord2f(1.0f, 1.0f);glVertex3f(6, 0, 6);
@@ -342,8 +338,10 @@ void Draw() {
 	glFlush();
 }
 
-void Initialize(int width, int height) {
-	LoadGLTextures();
+bool Initialize(int width, int height) {
+	if(!LoadGLTextures()){
+		return false;
+	}
 
 	glEnable(GL_TEXTURE_2D);
 	glShadeModel(GL_SMOOTH);							// Enable Smooth Shading
@@ -353,12 +351,19 @@ void Initialize(int width, int height) {
 	glDepthFunc(GL_LEQUAL);								// The Type Of Depth Testing To Do
 	glHint(GL_PERSPECTIVE_CORRECTION_HINT, GL_NICEST);	// Really Nice Perspective Calculations
 
+	glLightfv(GL_LIGHT1, GL_AMBIENT, LightAmbient);		// Setup The Ambient Light
+	glLightfv(GL_LIGHT1, GL_DIFFUSE, LightDiffuse);		// Setup The Diffuse Light
+	glLightfv(GL_LIGHT1, GL_POSITION,LightPosition);	// Position The Light
+	glEnable(GL_LIGHT1);								// Enable Light One
+
 	glMatrixMode(GL_PROJECTION);
 	glLoadIdentity();
 	gluPerspective(45.0f,(GLfloat)width/(GLfloat)height,0.1f,100.0f);
 	glTranslatef(0.0f, 0.0f, -8.0);
 	glMatrixMode(GL_MODELVIEW);	
 	glLoadIdentity();
+
+	return true;
 }
 
 void processMouseClick(int button, int state, int x, int y) {
@@ -403,7 +408,9 @@ int main(int iArgc, char** cppArgv) {
 	glutInitWindowSize(windWidth, windHeight);
 	glutInitWindowPosition(200, 200);
 	glutCreateWindow("CG");
-	Initialize(windWidth, windHeight);
+	if(!Initialize(windWidth, windHeight)){
+		return 1;
+	}
 	glutDisplayFunc(Draw);
 	glutIdleFunc(Draw);
 
