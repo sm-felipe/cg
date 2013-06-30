@@ -59,15 +59,21 @@ void Parallelepiped::setAngle(float angle){
 	this->angle = angle;
 }
 
-void Parallelepiped::draw(){
+void Parallelepiped::calculateDraw(){
+
+
+	//glLoadIdentity();							// Reset The Current Modelview Matrix
+	glTranslatef(center->x, center->y, center->z);
+	glRotatef(angle, 0, 1, 0);
+}
+
+void Parallelepiped::draw() {
+	calculateDraw();
 
 	float x = width / 2.0f;
 	float y = height / 2.0f;
 	float z = depth / 2.0f;
 
-	//glLoadIdentity();							// Reset The Current Modelview Matrix
-	glTranslatef(center->x, center->y, center->z);
-	glRotatef(angle, 0, 1, 0);
 	glBegin(GL_QUADS);							// Draw A Quad								
 		glColor3f(0.0f,1.0f,0.0f);				// Set The Color To Green
 		glVertex3f( x, y,-z);					// Top Right Of The Quad (Top)
@@ -101,3 +107,4 @@ void Parallelepiped::draw(){
 		glVertex3f( x,-y,-z);					// Bottom Right Of The Quad (Right)
 	glEnd();									// Done Drawing The Quad
 }
+

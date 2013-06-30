@@ -8,7 +8,6 @@
 #include <Windows.h>
 #include "ObjectClasses.h"
 #include <stdio.h>
-#include <glut.h>
 #include <math.h>
 #include "SOIL.h"
 
@@ -29,7 +28,7 @@ float _z;
 
 float garraAngle = 0;
 float garraHipotenusa = 1.2f;
-float garraVelocidadeRotacao = 0.1f;
+float garraVelocidadeRotacao = 0.2f;
 
 Cube* esqCube = new Cube(0.1f);
 Cube* dirCube = new Cube(0.1f);
@@ -37,7 +36,7 @@ Cube* dirCube = new Cube(0.1f);
 // OBJETOS //
 const int numObjetos = 1;
 Parallelepiped* boxes[numObjetos];
-//falta fazer o vetor de objetos de fato
+Shape* shapes[numObjetos];
 
 
 //COLISÃO
@@ -49,7 +48,7 @@ bool rightTouch = false;
 // controle da camera
 float angle = 180;
 float hipotenusa = 8;
-float velocidadeRotacao = 0.1;
+float velocidadeRotacao = 0.2;
 bool rotateCam = false;
 
 //TEXTURA
@@ -160,6 +159,11 @@ void detectaColisao(){
 	}
 }
 
+void centralizaObj(){
+	if(indiceColisao != -1){
+		boxes[indiceColisao]->move(_x, _y, _z);
+	}
+}
 void changeCameraPos(){
 	glLoadIdentity();
 	
@@ -178,28 +182,27 @@ void changeCameraPos(){
 void voltaCuboEObjeto(){
 	Parallelepiped* moveObj = new Parallelepiped(0, 0 ,0);
 	bool colisao = indiceColisao != -1;
-	PONTO* objPos;
+	PONTO* objCenter;
+
+	
 
 	if(colisao){
 		moveObj = boxes[indiceColisao];
-		objPos = moveObj->getPos();
+		objCenter = moveObj->getPos();
 	}
-
-	float xRotate = cos(garraAngle * PI / 180.0) * garraHipotenusa;
-	float zRotate = sin(garraAngle * PI / 180.0) * garraHipotenusa;
 
 	//TODO ajustar isso pra fazer mudanças em x e z de forma mais suave
 	if(_y < 5.0f){
 		_y += velocidade;
-		if(colisao)	moveObj->move(objPos->x, _y - (moveObj->getHeight()/2.0f), objPos->z );
+		if(colisao)	moveObj->move(objCenter->x, _y - (moveObj->getHeight()/2.0f), objCenter->z );
 	}else if(_x < 5.2f){
 		_x += velocidade;
-		if(colisao) moveObj->move(_x, objPos->y, objPos->z);
+		if(colisao) moveObj->move(_x, objCenter->y, objCenter->z);
 	}else if(_z > -6.0f){
 		_z -= velocidade;
-		if(colisao) moveObj->move(objPos->x, objPos->y, _z);
+		if(colisao) moveObj->move(objCenter->x, objCenter->y, _z);
 	}else if(moveObj->getPos()->y > -10.0f && colisao){
-		if(colisao) moveObj->move(objPos->x, objPos->y - velocidade, objPos->z);
+		if(colisao) moveObj->move(objCenter->x, objCenter->y - velocidade, objCenter->z);
 	}else{
 		estado = JOGANDO;
 		indiceColisao = -1;
@@ -348,6 +351,7 @@ void Draw() {
 		case DESCENDO:
 			desceCubo();
 			detectaColisao();
+			centralizaObj();
 			break;
 
 		case VOLTANDO:
@@ -363,10 +367,11 @@ void Draw() {
 		changeCameraPos();
 		Parallelepiped* parall = boxes[i];
 		if(estado == VOLTANDO && i == indiceColisao){
-			PONTO* p = parall->center;
 			parall->setAngle(-garraAngle);
 		}
-		parall->draw();
+		//parall->draw();
+		parall->calculateDraw();
+		shapes[i]->draw(0);
 	}
 
 	//chao
@@ -448,6 +453,8 @@ void processMouseMotion(int x, int z) {
 void initializeObjects(){
 	boxes[0] = new Parallelepiped(1, 4, 4);
 	boxes[0]->move(3, 0.3f, -3);
+	shapes[0] = new Shape(1);
+
 	//TODO adicionar outros objetos.
 }
 

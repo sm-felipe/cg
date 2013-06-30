@@ -1,6 +1,7 @@
 #include <windows.h>		// Header File For Windows
 #include <gl\gl.h>			// Header File For The OpenGL32 Library
 #include <gl\glu.h>			// Header File For The GLu32 Library
+#include <glut.h>
 
 struct PONTO {
 	float x;
@@ -75,12 +76,14 @@ public:
 
 	void draw();
 
+	void calculateDraw();
+
 private:
 	float height;
 	float width;
 	float depth;
 	float angle;
-
+	
 };
 
 class Garra : ObjectClass
@@ -110,4 +113,22 @@ private:
 	PONTO* right;
 	void (*changeCameraFunc)();
 
+};
+
+class Shape : ObjectClass {
+public:
+
+	Shape(int type);
+
+	int type;
+
+	void draw(GLfloat angle);
+
+	const static int TEAPOT = 1;
+	const static int CUBE = 2;
+	const static int SPHERE = 3;
+	const static int PARALLEL = 4;
+
+private:
+	
 };
