@@ -30,6 +30,8 @@ float garraAngle = 0;
 float garraHipotenusa = 1.2f;
 float garraVelocidadeRotacao = 0.2f;
 
+float velocidadeMov = 0.003f;
+
 Cube* esqCube = new Cube(0.1f);
 Cube* dirCube = new Cube(0.1f);
 
@@ -63,7 +65,7 @@ GLfloat LightPosition[]={ 0.0f, 6.0f, -3.0f, 1.0f };
 
 
 // OUTROS //
-float velocidade = 0.0007f;
+
 int windWidth = 720;
 int windHeight = 540;
 float yMin = 1.4f;
@@ -193,16 +195,16 @@ void voltaCuboEObjeto(){
 
 	//TODO ajustar isso pra fazer mudanças em x e z de forma mais suave
 	if(_y < 5.0f){
-		_y += velocidade;
+		_y += velocidadeMov;
 		if(colisao)	moveObj->move(objCenter->x, _y - (moveObj->getHeight()/2.0f), objCenter->z );
 	}else if(_x < 5.2f){
-		_x += velocidade;
+		_x += velocidadeMov;
 		if(colisao) moveObj->move(_x, objCenter->y, objCenter->z);
 	}else if(_z > -6.0f){
-		_z -= velocidade;
+		_z -= velocidadeMov;
 		if(colisao) moveObj->move(objCenter->x, objCenter->y, _z);
 	}else if(moveObj->getPos()->y > -10.0f && colisao){
-		if(colisao) moveObj->move(objCenter->x, objCenter->y - velocidade, objCenter->z);
+		if(colisao) moveObj->move(objCenter->x, objCenter->y - velocidadeMov, objCenter->z);
 	}else{
 		estado = JOGANDO;
 		indiceColisao = -1;
@@ -234,9 +236,9 @@ void releasedZKey(unsigned char key, int x, int y){
 		rotateCam = false;
 }
 
-void desceCubo(){
+void desceGarra(){
 	if(_y >= yMin){
-		_y -= 1 * velocidade;
+		_y -= 1 * velocidadeMov;
 	}
 }
 
@@ -349,7 +351,7 @@ void Draw() {
 			break;
 
 		case DESCENDO:
-			desceCubo();
+			desceGarra();
 			detectaColisao();
 			centralizaObj();
 			break;
@@ -451,7 +453,7 @@ void processMouseMotion(int x, int z) {
 }
 
 void initializeObjects(){
-	boxes[0] = new Parallelepiped(1, 4, 4);
+	boxes[0] = new Parallelepiped(1.5, 3, 1.95);
 	boxes[0]->move(3, 0.3f, -3);
 	shapes[0] = new Shape(1);
 
