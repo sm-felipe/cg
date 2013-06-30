@@ -27,8 +27,10 @@ float _x;
 float _y = 5.0f;
 float _z;
 
+float garraAngle = 0;
+float garraHipotenusa = 1.2f;
+float garraVelocidadeRotacao = 0.1f;
 
-// CUBOS PARA DEBUG //
 Cube* esqCube = new Cube(0.1f);
 Cube* dirCube = new Cube(0.1f);
 
@@ -37,11 +39,11 @@ const int numObjetos = 1;
 Parallelepiped* boxes[numObjetos];
 //falta fazer o vetor de objetos de fato
 
+
 //COLISÃO
 int indiceColisao = -1;
 bool leftTouch = false;
 bool rightTouch = false;
-
 
 
 // controle da camera
@@ -158,37 +160,6 @@ void detectaColisao(){
 	}
 }
 
-void voltaCuboEObjeto(){
-	Parallelepiped* moveObj = new Parallelepiped(0, 0 ,0);
-	bool colisao = indiceColisao != -1;
-	PONTO* objPos;
-
-	if(colisao){
-		moveObj = boxes[indiceColisao];
-		objPos = moveObj->getPos();
-	}
-
-	
-
-	//TODO ajustar isso pra fazer mudanças em x e z de forma mais suave
-	if(_y < 5.0f){
-		_y += velocidade;
-		if(colisao)	moveObj->move(objPos->x, _y - (moveObj->getHeight()/2.0f), objPos->z);
-	}else if(_x < 5.2f){
-		_x += velocidade;
-		if(colisao) moveObj->move(_x, objPos->y, objPos->z);
-	}else if(_z > -6.0f){
-		_z -= velocidade;
-		if(colisao) moveObj->move(objPos->x, objPos->y, _z);
-	}else if(moveObj->getPos()->y > -10.0f && colisao){
-		if(colisao) moveObj->move(objPos->x, objPos->y - velocidade, objPos->z);
-	}else{
-		estado = JOGANDO;
-		indiceColisao = -1;
-	}
-}
-
-
 void changeCameraPos(){
 	glLoadIdentity();
 	
@@ -204,6 +175,36 @@ void changeCameraPos(){
 		0.0f, 1.0f,  0.0f);*/
 }
 
+void voltaCuboEObjeto(){
+	Parallelepiped* moveObj = new Parallelepiped(0, 0 ,0);
+	bool colisao = indiceColisao != -1;
+	PONTO* objPos;
+
+	if(colisao){
+		moveObj = boxes[indiceColisao];
+		objPos = moveObj->getPos();
+	}
+
+	float xRotate = cos(garraAngle * PI / 180.0) * garraHipotenusa;
+	float zRotate = sin(garraAngle * PI / 180.0) * garraHipotenusa;
+
+	//TODO ajustar isso pra fazer mudanças em x e z de forma mais suave
+	if(_y < 5.0f){
+		_y += velocidade;
+		if(colisao)	moveObj->move(objPos->x, _y - (moveObj->getHeight()/2.0f), objPos->z );
+	}else if(_x < 5.2f){
+		_x += velocidade;
+		if(colisao) moveObj->move(_x, objPos->y, objPos->z);
+	}else if(_z > -6.0f){
+		_z -= velocidade;
+		if(colisao) moveObj->move(objPos->x, objPos->y, _z);
+	}else if(moveObj->getPos()->y > -10.0f && colisao){
+		if(colisao) moveObj->move(objPos->x, objPos->y - velocidade, objPos->z);
+	}else{
+		estado = JOGANDO;
+		indiceColisao = -1;
+	}
+}
 
 
 
@@ -236,14 +237,27 @@ void desceCubo(){
 	}
 }
 
+void atualizaAnguloGarra(){
+	if(estado == VOLTANDO){
+		garraAngle += garraVelocidadeRotacao;
+	}else{
+		if( (garraAngle / 360.0 ) > 0){
+			garraAngle += garraVelocidadeRotacao;
+
+			if(((int) garraAngle) % 360 == 0){
+				garraAngle = 0;
+			}
+		}
+	}
+}
+
 void drawGarra(){
+	
 	//draw center
 	changeCameraPos();
 	glColor3f(0.7,0.7,0.7);
 	glTranslatef(_x, _y + 0.5, _z);
 	glRotatef(90.0, 1, 0, 0);
-
-	
     glBegin(GL_POLYGON);
 		glBindTexture(GL_TEXTURE_2D, metal);
 		GLUquadricObj *obj = gluNewQuadric();
@@ -252,43 +266,46 @@ void drawGarra(){
     glEnd();
 
 	float coneHeight = 1;
-
+	float xRotate = cos(garraAngle * PI / 180.0) * garraHipotenusa;
+	float zRotate = sin(garraAngle * PI / 180.0) * garraHipotenusa;
+	
 
 	//draw left
 	changeCameraPos();
 	glColor3f(0.7,0.7,0.7);
-	glTranslatef(_x + 1.2, _y - 0.4, _z);
+	glTranslatef(_x + xRotate, _y - 0.4, _z + zRotate);
+	glRotatef(-garraAngle, 0, 1, 0);
 	glRotatef(270.0, 1, 0, 0);
 	glRotatef(-50.0, 0, 1, 0);
 	glBindTexture(GL_TEXTURE_2D, -1);
 	glutSolidCone(0.2, coneHeight, 30, 30);
-	
 
 	changeCameraPos();
-	glTranslatef(_x + 1.2, _y - 0.3, _z);
+	glTranslatef(_x + xRotate, _y - 0.3, _z + zRotate);
 	glRotatef(270.0, 1, 0, 0);
 	glRotatef(-180.0, 0, 1, 0);
 	glBindTexture(GL_TEXTURE_2D, -1);
 	glutSolidCone(0.2, coneHeight, 30, 30);
-	esqCube->move(_x + 1.2, _y - 0.3 - coneHeight, _z);//DEBUG deveria ser um ponto
+	esqCube->move(_x + xRotate, _y - 0.3 - coneHeight, _z + + zRotate);
+
 
 	//draw right
 	changeCameraPos();
 	glColor3f(0.7,0.7,0.7);
-	glTranslatef(_x - 1.2, _y - 0.4, _z);
+	glTranslatef(_x - xRotate, _y - 0.4, _z - zRotate);
+	glRotatef(-garraAngle, 0, 1, 0);
 	glRotatef(-90.0, 1, 0, 0);
 	glRotatef(50.0, 0, 1, 0);
 	glBindTexture(GL_TEXTURE_2D, -1);
 	glutSolidCone(0.2, coneHeight, 30, 30);
 
 	changeCameraPos();
-	glTranslatef(_x - 1.2, _y - 0.3, _z);
+	glTranslatef(_x - xRotate, _y - 0.3, _z - zRotate);
 	glRotatef(-90.0, 1, 0, 0);
 	glRotatef(180.0, 0, 1, 0);
 	glBindTexture(GL_TEXTURE_2D, -1);
 	glutSolidCone(0.2, coneHeight, 30, 30);
-	dirCube->move(_x - 1.2, _y - 0.3 - coneHeight, _z);//DEBUG deveria ser um ponto
-
+	dirCube->move(_x - xRotate, _y - 0.3 - coneHeight, _z - zRotate);
 }
 
 
@@ -313,13 +330,13 @@ void drawLightSource(){
 	Sphere=gluNewQuadric();
 	gluSphere(Sphere,0.3,30,30);
 	gluDeleteQuadric(Sphere);
-	
 }
 
 void Draw() {
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);	// Clear Screen And Depth Buffer
 	
 	atualizaAnguloCamera();
+	atualizaAnguloGarra();
 
 	drawGarra();
 
