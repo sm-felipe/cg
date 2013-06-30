@@ -192,14 +192,13 @@ void voltaCuboEObjeto(){
 		objCenter = moveObj->getPos();
 	}
 
-	//TODO ajustar isso pra fazer mudanças em x e z de forma mais suave
 	if(_y < 5.0f){
 		_y += velocidadeMov;
 		if(colisao)	moveObj->move(objCenter->x, _y - (moveObj->getHeight()/2.0f), objCenter->z );
 	}else if(_x < 5.2f){
 		_x += velocidadeMov;
 		if(colisao) moveObj->move(_x, objCenter->y, objCenter->z);
-	}else if(_z > -6.0f){
+	}else if(_z > -7.8f){
 		_z -= velocidadeMov;
 		if(colisao) moveObj->move(objCenter->x, objCenter->y, _z);
 	}else if(moveObj->getPos()->y > -10.0f && colisao){
@@ -210,8 +209,6 @@ void voltaCuboEObjeto(){
 		indiceColisao = -1;
 	}
 }
-
-
 
 
 void atualizaAnguloCamera(){
@@ -385,7 +382,7 @@ void Draw() {
 	changeCameraPos();
 	drawLightSource();
 
-	//debug
+
 	changeCameraPos();
 	esqCube->draw();
 
