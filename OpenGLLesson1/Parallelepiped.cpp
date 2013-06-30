@@ -10,6 +10,8 @@ Parallelepiped::Parallelepiped(PONTO* start, PONTO* end){
 	center->x = width/2.0f + start->x;
 	center->y = height/2.0f + start->y;
 	center->z = depth/2.0f + start->z;
+
+	this->angle = 0;
 }
 
 Parallelepiped::Parallelepiped(float height, float width, float depth){
@@ -21,6 +23,8 @@ Parallelepiped::Parallelepiped(float height, float width, float depth){
 	center->x = 0;
 	center->y = 0;
 	center->z = 0;
+
+	this->angle = 0;
 }
 
 void Parallelepiped::move(float x, float y, float z){
@@ -51,6 +55,10 @@ float Parallelepiped::getDepth(){
 	return depth;
 }
 
+void Parallelepiped::setAngle(float angle){
+	this->angle = angle;
+}
+
 void Parallelepiped::draw(){
 
 	float x = width / 2.0f;
@@ -59,6 +67,7 @@ void Parallelepiped::draw(){
 
 	//glLoadIdentity();							// Reset The Current Modelview Matrix
 	glTranslatef(center->x, center->y, center->z);
+	glRotatef(angle, 0, 1, 0);
 	glBegin(GL_QUADS);							// Draw A Quad								
 		glColor3f(0.0f,1.0f,0.0f);				// Set The Color To Green
 		glVertex3f( x, y,-z);					// Top Right Of The Quad (Top)

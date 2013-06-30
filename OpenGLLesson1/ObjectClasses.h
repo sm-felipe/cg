@@ -71,12 +71,15 @@ public:
 
 	float getDepth();
 
+	void setAngle(float angle);
+
 	void draw();
 
 private:
 	float height;
 	float width;
 	float depth;
+	float angle;
 
 };
 

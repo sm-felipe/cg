@@ -359,9 +359,14 @@ void Draw() {
 	}
 
 	//objetos
-	for(Parallelepiped* box : boxes){
+	for(int i = 0; i < sizeOfBoxes(); i++){
 		changeCameraPos();
-		box->draw();
+		Parallelepiped* parall = boxes[i];
+		if(estado == VOLTANDO && i == indiceColisao){
+			PONTO* p = parall->center;
+			parall->setAngle(-garraAngle);
+		}
+		parall->draw();
 	}
 
 	//chao
