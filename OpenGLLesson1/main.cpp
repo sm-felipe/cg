@@ -472,10 +472,8 @@ void initializeObjects(){
 	shapes[2] = new Shape(consts->CUBE);
 
 	boxes[3] = new Parallelepiped(3.2, 3.2, 3.2);
-	boxes[3]->move(2, 2.24, 2);
+	boxes[3]->move(3, 2.24, 3);
 	shapes[3] = new Shape(consts->CONE);
-
-	//TODO adicionar outros objetos.
 }
 
 
