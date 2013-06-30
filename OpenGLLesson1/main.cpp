@@ -51,7 +51,9 @@ float velocidadeRotacao = 0.1;
 bool rotateCam = false;
 
 //TEXTURA
-GLuint      texture[3]; 
+GLuint      chao;
+GLuint		wood;
+GLuint		metal;
 
 //LUZ
 GLfloat LightAmbient[]= { 0.5f, 0.5f, 0.5f, 1.0f }; //TODO: renomear isso
@@ -68,36 +70,29 @@ int sizeOfBoxes(){
 	return sizeof(boxes) / sizeof(Cube*);
 }
 
-bool loadGLTexture(char* name, int pos){
-	//load an image file directly as a new OpenGL texture 
-    texture[pos] = SOIL_load_OGL_texture
-        (
-        name,
-        SOIL_LOAD_AUTO,
-        SOIL_CREATE_NEW_ID,
-        SOIL_FLAG_INVERT_Y
-        );
-
-	 if(texture[0] == 0)
-        return false;
- 
-    // Typical Texture Generation Using Data From The Bitmap
-    glBindTexture(GL_TEXTURE_2D, texture[pos]);
-
-	return true;
-}
 
 int LoadGLTextures()                                    // Load Bitmaps And Convert To Textures
 {
-	bool result = loadGLTexture("floor.bmp", 0);
-	if(result) loadGLTexture("wood.bmp", 1);
-	if (result) loadGLTexture("metal.bmp", 2);
 
-	if(!result) return false;
+	chao = SOIL_load_OGL_texture("floor.bmp", SOIL_LOAD_AUTO, SOIL_CREATE_NEW_ID, SOIL_FLAG_INVERT_Y);
+	if(chao == 0)
+		return false;
+	glBindTexture(GL_TEXTURE_2D, chao);
+
+	wood = SOIL_load_OGL_texture("wood.bmp", SOIL_LOAD_AUTO, SOIL_CREATE_NEW_ID, SOIL_FLAG_INVERT_Y);
+	if(wood == 0)
+		return false;
+	glBindTexture(GL_TEXTURE_2D, wood);
+
+	metal = SOIL_load_OGL_texture("metal.bmp", SOIL_LOAD_AUTO, SOIL_CREATE_NEW_ID, SOIL_FLAG_INVERT_Y);
+	if(metal == 0)
+		return false;
+	glBindTexture(GL_TEXTURE_2D, metal);
+
 	glTexParameteri(GL_TEXTURE_2D,GL_TEXTURE_MIN_FILTER,GL_LINEAR);
     glTexParameteri(GL_TEXTURE_2D,GL_TEXTURE_MAG_FILTER,GL_LINEAR);
 
-    return true;                                        // Return Success
+    return true; 
 }
 
 bool haColisao(PONTO* pontaGarra, Parallelepiped* box){
@@ -208,6 +203,10 @@ void changeCameraPos(){
 		0.0f, 1.0f,  0.0f);*/
 }
 
+
+
+
+
 void atualizaAnguloCamera(){
 	if(rotateCam){
 		if(angle < 270){
@@ -242,47 +241,57 @@ void drawGarra(){
 	glColor3f(0.7,0.7,0.7);
 	glTranslatef(_x, _y + 0.5, _z);
 	glRotatef(90.0, 1, 0, 0);
+
+	
     glBegin(GL_POLYGON);
+		glBindTexture(GL_TEXTURE_2D, metal);
 		GLUquadricObj *obj = gluNewQuadric();
+		gluQuadricTexture(obj, 1);
 		gluCylinder(obj, 0.6, 0.6, 0.5, 30, 30);
     glEnd();
 
 	float coneHeight = 1;
 
+
 	//draw left
 	changeCameraPos();
-	glColor3f(1,0.7,0.7);
+	glColor3f(0.7,0.7,0.7);
 	glTranslatef(_x + 1.2, _y - 0.4, _z);
 	glRotatef(270.0, 1, 0, 0);
 	glRotatef(-50.0, 0, 1, 0);
+	glBindTexture(GL_TEXTURE_2D, -1);
 	glutSolidCone(0.2, coneHeight, 30, 30);
+	
 
 	changeCameraPos();
 	glTranslatef(_x + 1.2, _y - 0.3, _z);
 	glRotatef(270.0, 1, 0, 0);
 	glRotatef(-180.0, 0, 1, 0);
+	glBindTexture(GL_TEXTURE_2D, -1);
 	glutSolidCone(0.2, coneHeight, 30, 30);
 	esqCube->move(_x + 1.2, _y - 0.3 - coneHeight, _z);//DEBUG deveria ser um ponto
 
 	//draw right
 	changeCameraPos();
-	glColor3f(1,0.7,0.7);
+	glColor3f(0.7,0.7,0.7);
 	glTranslatef(_x - 1.2, _y - 0.4, _z);
 	glRotatef(-90.0, 1, 0, 0);
 	glRotatef(50.0, 0, 1, 0);
+	glBindTexture(GL_TEXTURE_2D, -1);
 	glutSolidCone(0.2, coneHeight, 30, 30);
 
 	changeCameraPos();
 	glTranslatef(_x - 1.2, _y - 0.3, _z);
 	glRotatef(-90.0, 1, 0, 0);
 	glRotatef(180.0, 0, 1, 0);
+	glBindTexture(GL_TEXTURE_2D, -1);
 	glutSolidCone(0.2, coneHeight, 30, 30);
 	dirCube->move(_x - 1.2, _y - 0.3 - coneHeight, _z);//DEBUG deveria ser um ponto
 
 }
 
 void drawFloor(){
-	glBindTexture(GL_TEXTURE_2D, texture[0]);
+	glBindTexture(GL_TEXTURE_2D, chao);
 	glBegin(GL_QUADS);
 		glColor3f(1.0f, 1.0f, 1.0f);
 		glNormal3f( 0.0f, 1.0f, 0.0f);
