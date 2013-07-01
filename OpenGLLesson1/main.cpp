@@ -264,7 +264,7 @@ void drawGarra(){
 		glBindTexture(GL_TEXTURE_2D, metal);
 		GLUquadricObj *obj = gluNewQuadric();
 		gluQuadricTexture(obj, 1);
-		gluCylinder(obj, 0.6, 0.6, 0.5, 30, 30);
+		gluCylinder(obj, 0.6, 0.6, 0.5, 40, 30);
     glEnd();
 
 	float coneHeight = 1;
@@ -426,6 +426,23 @@ bool Initialize(int width, int height) {
 	return true;
 }
 
+GLvoid adjustSize(GLsizei width, GLsizei height)		// Resize And Initialize The GL Window
+{
+	if (height==0)										// Prevent A Divide By Zero By
+	{
+		height=1;										// Making Height Equal One
+	}
+
+	glMatrixMode(GL_PROJECTION);						// Select The Projection Matrix
+	glLoadIdentity();									// Reset The Projection Matrix
+	glViewport(0,0,width,height);						// Reset The Current Viewport
+	float ratio = 1.0* width / height;
+	gluPerspective(45.0f,ratio,0.1f,100.0f);
+	glTranslatef(0.0f, 0.0f, -8.0);
+	glMatrixMode(GL_MODELVIEW);							// Select The Modelview Matrix
+	glLoadIdentity();									// Reset The Modelview Matrix
+}
+
 void processMouseClick(int button, int state, int x, int y) {
 	if(estado == JOGANDO){
 		if(button == GLUT_LEFT_BUTTON && state == GLUT_DOWN){
@@ -500,6 +517,7 @@ int main(int iArgc, char** cppArgv) {
 	}
 	glutDisplayFunc(Draw);
 	glutIdleFunc(Draw);
+	glutReshapeFunc(adjustSize);
 
 	glutKeyboardFunc(getZKey);
 	glutKeyboardUpFunc(releasedZKey);
