@@ -486,19 +486,19 @@ void initializeObjects(){
 	Shape* consts = new Shape(0);
 
 	boxes[0] = new Parallelepiped(1.5, 3, 1.95);
-	boxes[0]->move(3, 0.8, -3);
+	boxes[0]->move(3, 0.75, -3);
 	shapes[0] = new Shape(consts->TEAPOT);
 
 	boxes[1] = new Parallelepiped(2.8, 2.8, 2.8);
-	boxes[1]->move(-3, 1.24, -4);
+	boxes[1]->move(-3, 1.38, -4);
 	shapes[1] = new Shape(consts->SPHERE);
 
-	boxes[2] = new Parallelepiped(2.6, 2.6, 2.6);
-	boxes[2]->move(-3, 1.24, 4);
+	boxes[2] = new Parallelepiped(2.7, 2.7, 2.7);
+	boxes[2]->move(-3, 1.38, 4);
 	shapes[2] = new Shape(consts->CUBE);
 
 	boxes[3] = new Parallelepiped(3.2, 3.2, 3.2);
-	boxes[3]->move(3, 2.24, 3);
+	boxes[3]->move(3, 1.6, 3);
 	shapes[3] = new Shape(consts->CONE);
 }
 
