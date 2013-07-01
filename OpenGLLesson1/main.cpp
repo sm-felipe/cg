@@ -135,27 +135,31 @@ bool haColisao(PONTO* pontaGarra, Parallelepiped* box){
 
 
 void detectaColisao(){
-		
-	int i = 0;
-	Parallelepiped* box;
-
+	
+	int leftI = 0;
+	Parallelepiped* leftBox;
 	bool leftColidiu = false;//colisao esquerda
-	for(i; i < sizeOfBoxes(); i++){
-		box = boxes[i];
-		leftColidiu = haColisao(esqCube->getPos(), box);
+	for(leftI; leftI < sizeOfBoxes(); leftI++){
+		leftBox = boxes[leftI];
+		leftColidiu = haColisao(esqCube->getPos(), leftBox);
 		if(leftColidiu){
 			break;
 		}
 	}
 
-	if(leftColidiu){
-		bool debug = true;
+	int rightI = 0;
+	Parallelepiped* rightBox;
+	bool rightColidiu = false;//colisao direita
+	for(rightI; rightI < sizeOfBoxes(); rightI++){
+		rightBox = boxes[rightI];
+		rightColidiu = haColisao(dirCube->getPos(), rightBox);
+		if(rightColidiu){
+			break;
+		}
 	}
 
-	bool rightColidiu = false;//colisao direita
-	rightColidiu = haColisao(dirCube->getPos(), box);
-	if(leftColidiu && rightColidiu){
-		indiceColisao = i;
+	if(leftColidiu && rightColidiu && rightI == leftI){
+		indiceColisao = rightI;
 	}
 
 	bool bateuChao = _y <= yMin;
