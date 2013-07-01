@@ -311,7 +311,6 @@ void drawGarra(){
 }
 
 
-
 void drawFloor(){
 	glBindTexture(GL_TEXTURE_2D, chao);
 	glBegin(GL_QUADS);
@@ -441,6 +440,9 @@ GLvoid adjustSize(GLsizei width, GLsizei height)		// Resize And Initialize The G
 	glTranslatef(0.0f, 0.0f, -8.0);
 	glMatrixMode(GL_MODELVIEW);							// Select The Modelview Matrix
 	glLoadIdentity();									// Reset The Modelview Matrix
+
+	windWidth = width;
+	windHeight = height;
 }
 
 void processMouseClick(int button, int state, int x, int y) {
@@ -464,9 +466,13 @@ void processMouseMotion(int x, int z) {
 	float maxZ = 6.0f;
 	
 	if(estado == JOGANDO){
+			float conversionFactor = 13.5f;
 
-			deltax = ((windWidth/40.0f - x) / 40.0f) - _x;
-			deltaz = ((windHeight/40.0f - z) / 40.0f) - _z;
+			float xMouseFactor = windWidth / conversionFactor;
+			float zMouseFactor = windHeight / conversionFactor;
+
+			deltax = ((windWidth/xMouseFactor - x) / xMouseFactor) - _x;
+			deltaz = ((windHeight/zMouseFactor - z) / zMouseFactor) - _z;
 
 			float tempX = _x + deltax;
 			float tempZ = _z + deltaz;
