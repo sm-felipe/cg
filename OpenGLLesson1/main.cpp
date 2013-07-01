@@ -28,7 +28,7 @@ float _z;
 
 float yMin = 1.4f;
 
-float velocidadeMov = 0.003f;
+float velocidadeMov = 0.005f;
 
 float garraAngle = 0;
 float garraHipotenusa = 1.2f;
@@ -182,7 +182,7 @@ void changeCameraPos(){
 		0.0f, 1.0f,  0.0f);*/
 }
 
-void voltaCuboEObjeto(){
+void voltaGarraEObjeto(){
 	Parallelepiped* moveObj = new Parallelepiped(0, 0 ,0);
 	bool colisao = indiceColisao != -1;
 	PONTO* objCenter;
@@ -354,7 +354,7 @@ void Draw() {
 			break;
 
 		case VOLTANDO:
-			voltaCuboEObjeto();
+			voltaGarraEObjeto();
 			break;
 
 		default:
@@ -441,13 +441,25 @@ void processMouseMotion(int x, int z) {
 	float deltax = 0;
 	float deltaz = 0;
 
+	float minX = -4.8f;
+	float maxX = 4.8f;
+	float minZ = -6.0f;
+	float maxZ = 6.0f;
 	
 	if(estado == JOGANDO){
+
 			deltax = ((windWidth/40.0f - x) / 40.0f) - _x;
 			deltaz = ((windHeight/40.0f - z) / 40.0f) - _z;
 
-			_x += deltax;
-			_z += deltaz;
+			float tempX = _x + deltax;
+			float tempZ = _z + deltaz;
+
+			if(tempX >= minX && tempX <= maxX){
+				_x = tempX;
+			}
+			if(tempZ >= minZ && tempZ <= maxZ){
+				_z = tempZ;
+			}
 	}
 }
 
