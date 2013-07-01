@@ -60,6 +60,12 @@ GLuint      chao;
 GLuint		wood;
 GLuint		metal;
 
+//AMBIENTE//
+Parallelepiped* pilares[4];
+
+
+
+
 //LUZ //
 GLfloat LightAmbient[]= { 0.4f, 0.4f, 0.2f, 1.0f };
 GLfloat LightDiffuse[]= { 1.0f, 1.0f, 1.0f, 1.0f }; 
@@ -177,7 +183,7 @@ void changeCameraPos(){
 		0.0f, 0.0f,  0.0f,
 		0.0f, 1.0f,  0.0f);
 
-	/*gluLookAt(0.0f, 1.22, -5,
+	/*gluLookAt(2.0f, 1.22, -10,
 		0.0f, 2.0f,  0.0f,
 		0.0f, 1.0f,  0.0f);*/
 }
@@ -311,7 +317,8 @@ void drawGarra(){
 }
 
 
-void drawFloor(){
+void drawEnvironment(){
+	//floor
 	glBindTexture(GL_TEXTURE_2D, chao);
 	glBegin(GL_QUADS);
 		glColor3f(1.0f, 1.0f, 1.0f);
@@ -321,6 +328,26 @@ void drawFloor(){
 		glTexCoord2f(1.0f, 1.0f);glVertex3f(6, 0, 6);
 		glTexCoord2f(0.0f, 1.0f);glVertex3f(6, 0, -6);
 	glEnd();
+
+	changeCameraPos();
+	pilares[0]->move( 6.2, 5, 6.2);
+	pilares[0]->setTexture(wood);
+	pilares[0]->draw();
+
+	changeCameraPos();
+	pilares[1]->move( 6.2, 5,-6.2);
+	pilares[1]->setTexture(wood);
+	pilares[1]->draw();
+
+	changeCameraPos();
+	pilares[2]->move(-6.2, 5, 6.2);
+	pilares[2]->setTexture(wood);
+	pilares[2]->draw();
+
+	changeCameraPos();
+	pilares[3]->move(-6.2, 5,-6.2);
+	pilares[3]->setTexture(wood);
+	pilares[3]->draw();
 
 }
 
@@ -376,7 +403,7 @@ void Draw() {
 
 	//chao
 	changeCameraPos();
-	drawFloor();
+	drawEnvironment();
 
 	changeCameraPos();
 	drawLightSource();
@@ -508,10 +535,16 @@ void initializeObjects(){
 	shapes[3] = new Shape(consts->CONE);
 }
 
+void initializaEnvironment(){
+	for(int i = 0; i < (sizeof(pilares) / sizeof(Parallelepiped*)); i++){
+		pilares[i] = new Parallelepiped(10, 0.5, 0.5);
+	}
+}
 
 int main(int iArgc, char** cppArgv) {
 
 	initializeObjects();	
+	initializaEnvironment();
 	
 	glutInit(&iArgc, cppArgv);
 	glutInitDisplayMode(GLUT_SINGLE | GLUT_RGB |GLUT_DEPTH);

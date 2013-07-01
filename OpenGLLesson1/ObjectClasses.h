@@ -74,6 +74,8 @@ public:
 
 	void setAngle(float angle);
 
+	void setTexture(GLuint textureID);
+
 	void draw();
 
 	void calculateDraw();
@@ -83,6 +85,7 @@ private:
 	float width;
 	float depth;
 	float angle;
+	GLuint textureID;
 	
 };
 
