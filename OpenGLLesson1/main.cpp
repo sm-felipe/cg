@@ -201,7 +201,7 @@ void voltaGarraEObjeto(){
 	if(_y < 5.0f){
 		_y += velocidadeMov;
 		if(colisao)	moveObj->move(objCenter->x, _y - (moveObj->getHeight()/2.0f), objCenter->z );
-	}else if(_x < 5.2f){
+	}else if(_x < 4.3f){
 		_x += velocidadeMov;
 		if(colisao) moveObj->move(_x, objCenter->y, objCenter->z);
 	}else if(_z > -7.8f){
@@ -329,6 +329,7 @@ void drawEnvironment(){
 		glTexCoord2f(0.0f, 1.0f);glVertex3f(6, 0, -6);
 	glEnd();
 
+	//pilares
 	changeCameraPos();
 	pilares[0]->move( 6.2, 5, 6.2);
 	pilares[0]->setTexture(wood);
@@ -349,6 +350,7 @@ void drawEnvironment(){
 	pilares[3]->setTexture(wood);
 	pilares[3]->draw();
 
+	//fio
 	changeCameraPos();
 	glTranslatef(7, 6.3, -6.2);
 	glRotatef(-45.0, 0, 1, 0);
@@ -359,6 +361,40 @@ void drawEnvironment(){
 		gluCylinder(obj, 0.06, 0.06, 17, 20, 20);
     glEnd();
 
+	//túnel de saída
+	changeCameraPos();
+	glTranslatef(4.2, -5, -8);
+
+	float x = 2;
+	float y = 5;
+	float z = 2;
+
+	glBegin(GL_QUADS);
+		// Front Face
+		glNormal3f( 0.0f, 0.0f, 1.0f);
+		glTexCoord2f(0.0f, 0.0f); glVertex3f(-x, -y,  z);
+		glTexCoord2f(1.0f, 0.0f); glVertex3f( x, -y,  z);
+		glTexCoord2f(1.0f, 1.0f); glVertex3f( x,  y,  z);
+		glTexCoord2f(0.0f, 1.0f); glVertex3f(-x,  y,  z);
+		// Back Face
+		glNormal3f( 0.0f, 0.0f,-1.0f);
+		glTexCoord2f(1.0f, 0.0f); glVertex3f(-x, -y, -z);
+		glTexCoord2f(1.0f, 1.0f); glVertex3f(-x,  y, -z);
+		glTexCoord2f(0.0f, 1.0f); glVertex3f( x,  y, -z);
+		glTexCoord2f(0.0f, 0.0f); glVertex3f( x, -y, -z);
+		// Right face
+		glNormal3f( 1.0f, 0.0f, 0.0f);
+		glTexCoord2f(1.0f, 0.0f); glVertex3f( x, -y, -z);
+		glTexCoord2f(1.0f, 1.0f); glVertex3f( x,  y, -z);
+		glTexCoord2f(0.0f, 1.0f); glVertex3f( x,  y,  z);
+		glTexCoord2f(0.0f, 0.0f); glVertex3f( x, -y,  z);
+		// Left Face
+		glNormal3f(-1.0f, 0.0f, 0.0f);
+		glTexCoord2f(0.0f, 0.0f); glVertex3f(-x, -y, -z);
+		glTexCoord2f(1.0f, 0.0f); glVertex3f(-x, -y,  z);
+		glTexCoord2f(1.0f, 1.0f); glVertex3f(-x,  y,  z);
+		glTexCoord2f(0.0f, 1.0f); glVertex3f(-x,  y, -z);
+	glEnd();
 	
 
 }
