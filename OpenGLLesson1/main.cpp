@@ -1,10 +1,3 @@
-// A Simple OpenGL Project
-// Author: Michael Hall
-//
-// This C++ code and project are provided "as is" without warranty of any kind.
-//
-// Copyright 2010 XoaX - For personal use only, not for distribution
-
 #include <Windows.h>
 #include "ObjectClasses.h"
 #include <stdio.h>
@@ -63,9 +56,6 @@ GLuint		metal;
 //AMBIENTE//
 Parallelepiped* pilares[4];
 
-
-
-
 //LUZ //
 GLfloat LightAmbient[]= { 0.4f, 0.4f, 0.2f, 1.0f };
 GLfloat LightDiffuse[]= { 1.0f, 1.0f, 1.0f, 1.0f }; 
@@ -81,9 +71,7 @@ int sizeOfBoxes(){
 	return sizeof(boxes) / sizeof(Cube*);
 }
 
-
-int LoadGLTextures()                                    // Load Bitmaps And Convert To Textures
-{
+int loadTextures(){
 
 	chao = SOIL_load_OGL_texture("floor.bmp", SOIL_LOAD_AUTO, SOIL_CREATE_NEW_ID, SOIL_FLAG_INVERT_Y);
 	if(chao == 0)
@@ -138,7 +126,7 @@ void detectaColisao(){
 	
 	int leftI = 0;
 	Parallelepiped* leftBox;
-	bool leftColidiu = false;//colisao esquerda
+	bool leftColidiu = false;
 	for(leftI; leftI < sizeOfBoxes(); leftI++){
 		leftBox = boxes[leftI];
 		leftColidiu = haColisao(esqCube->getPos(), leftBox);
@@ -149,7 +137,7 @@ void detectaColisao(){
 
 	int rightI = 0;
 	Parallelepiped* rightBox;
-	bool rightColidiu = false;//colisao direita
+	bool rightColidiu = false;
 	for(rightI; rightI < sizeOfBoxes(); rightI++){
 		rightBox = boxes[rightI];
 		rightColidiu = haColisao(dirCube->getPos(), rightBox);
@@ -186,10 +174,6 @@ void changeCameraPos(){
 	gluLookAt(x,5.0f, z,
 		0.0f, 0.0f,  0.0f,
 		0.0f, 1.0f,  0.0f);
-
-	/*gluLookAt(2.0f, 1.22, -10,
-		0.0f, 2.0f,  0.0f,
-		0.0f, 1.0f,  0.0f);*/
 }
 
 void voltaGarraEObjeto(){
@@ -280,7 +264,6 @@ void drawGarra(){
 	float coneHeight = 1;
 	float xRotate = cos(garraAngle * PI / 180.0) * garraHipotenusa;
 	float zRotate = sin(garraAngle * PI / 180.0) * garraHipotenusa;
-	
 
 	//draw left
 	changeCameraPos();
@@ -299,7 +282,6 @@ void drawGarra(){
 	glBindTexture(GL_TEXTURE_2D, -1);
 	glutSolidCone(0.2, coneHeight, 30, 30);
 	esqCube->move(_x + xRotate, _y - 0.3 - coneHeight, _z + + zRotate);
-
 
 	//draw right
 	changeCameraPos();
@@ -322,7 +304,7 @@ void drawGarra(){
 
 
 void drawEnvironment(){
-	//floor
+	//chao
 	glBindTexture(GL_TEXTURE_2D, chao);
 	glBegin(GL_QUADS);
 		glColor3f(1.0f, 1.0f, 1.0f);
@@ -399,8 +381,6 @@ void drawEnvironment(){
 		glTexCoord2f(1.0f, 1.0f); glVertex3f(-x,  y,  z);
 		glTexCoord2f(0.0f, 1.0f); glVertex3f(-x,  y, -z);
 	glEnd();
-	
-
 }
 
 void drawLightSource(){
@@ -413,7 +393,7 @@ void drawLightSource(){
 }
 
 void Draw() {
-	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);	// Clear Screen And Depth Buffer
+	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 	
 	atualizaAnguloCamera();
 	atualizaAnguloGarra();
@@ -447,19 +427,17 @@ void Draw() {
 			if(estado == VOLTANDO && i == indiceColisao){
 				parall->setAngle(-garraAngle);
 			}
-			//parall->draw();
+			//parall->draw(); para ver as bounding box
 			parall->calculateDraw();
 			shapes[i]->draw(0);
 		}
 	}
 
-	//chao
 	changeCameraPos();
 	drawEnvironment();
 
 	changeCameraPos();
 	drawLightSource();
-
 
 	changeCameraPos();
 	esqCube->draw();
@@ -471,26 +449,25 @@ void Draw() {
 }
 
 bool Initialize(int width, int height) {
-	if(!LoadGLTextures()){
+	if(!loadTextures()){
 		return false;
 	}else{
 		esqCube->setTexture(metal);
 		dirCube->setTexture(metal);
 	}
 
-
 	glEnable(GL_TEXTURE_2D);
-	glShadeModel(GL_SMOOTH);							// Enable Smooth Shading
-	glClearColor(0.0, 0.0, 0.0, 0.5f);					// Black Background
-	glClearDepth(1.0f);									// Depth Buffer Setup
-	glEnable(GL_DEPTH_TEST);							// Enables Depth Testing
-	glDepthFunc(GL_LEQUAL);								// The Type Of Depth Testing To Do
-	glHint(GL_PERSPECTIVE_CORRECTION_HINT, GL_NICEST);	// Really Nice Perspective Calculations
+	glShadeModel(GL_SMOOTH);							
+	glClearColor(0.0, 0.0, 0.0, 0.5f);					
+	glClearDepth(1.0f);									
+	glEnable(GL_DEPTH_TEST);							
+	glDepthFunc(GL_LEQUAL);								
+	glHint(GL_PERSPECTIVE_CORRECTION_HINT, GL_NICEST);	
 
-	glLightfv(GL_LIGHT1, GL_AMBIENT, LightAmbient);		// Setup The Ambient Light
-	glLightfv(GL_LIGHT1, GL_DIFFUSE, LightDiffuse);		// Setup The Diffuse Light
-	glLightfv(GL_LIGHT1, GL_POSITION,LightPosition);	// Position The Light
-	glEnable(GL_LIGHT1);								// Enable Light One
+	glLightfv(GL_LIGHT1, GL_AMBIENT, LightAmbient);		
+	glLightfv(GL_LIGHT1, GL_DIFFUSE, LightDiffuse);		
+	glLightfv(GL_LIGHT1, GL_POSITION,LightPosition);	
+	glEnable(GL_LIGHT1);								
 	glEnable(GL_LIGHTING);
 	glEnable(GL_COLOR_MATERIAL);
 
@@ -504,21 +481,19 @@ bool Initialize(int width, int height) {
 	return true;
 }
 
-GLvoid adjustSize(GLsizei width, GLsizei height)		// Resize And Initialize The GL Window
-{
-	if (height==0)										// Prevent A Divide By Zero By
-	{
-		height=1;										// Making Height Equal One
+GLvoid adjustSize(GLsizei width, GLsizei height){
+	if (height==0){
+		height=1;									
 	}
 
-	glMatrixMode(GL_PROJECTION);						// Select The Projection Matrix
-	glLoadIdentity();									// Reset The Projection Matrix
-	glViewport(0,0,width,height);						// Reset The Current Viewport
+	glMatrixMode(GL_PROJECTION);						
+	glLoadIdentity();									
+	glViewport(0,0,width,height);						
 	float ratio = 1.0* width / height;
 	gluPerspective(45.0f,ratio,0.1f,100.0f);
 	glTranslatef(0.0f, 0.0f, -8.0);
-	glMatrixMode(GL_MODELVIEW);							// Select The Modelview Matrix
-	glLoadIdentity();									// Reset The Modelview Matrix
+	glMatrixMode(GL_MODELVIEW);							
+	glLoadIdentity();									
 
 	windWidth = width;
 	windHeight = height;
@@ -564,8 +539,6 @@ void processMouseMotion(int x, int z) {
 			}
 	}
 }
-
-
 
 void initializeObjects(){
 	Shape* consts = new Shape(0);

@@ -63,8 +63,6 @@ void Parallelepiped::setAngle(float angle){
 
 void Parallelepiped::calculateDraw(){
 
-
-	//glLoadIdentity();							// Reset The Current Modelview Matrix
 	glTranslatef(center->x, center->y, center->z);
 	glRotatef(angle, 0, 1, 0);
 }

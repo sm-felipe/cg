@@ -44,7 +44,6 @@ void Cube::draw(){
 	float l = halfEdgeSize;
 	bool useTexture = textureID != -1;
 
-	//glLoadIdentity();							// Reset The Current Modelview Matrix
 	glTranslatef(x, y, z);
 		
 	if(useTexture){
